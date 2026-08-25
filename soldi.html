@@ -1,0 +1,2499 @@
+<!DOCTYPE html>
+<html lang="it" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101219">
+<title>Soldi</title>
+<style>
+
+
+/* ============ TOKENS ============ */
+:root{
+  --void:#101219; --panel:#171a23; --inset:#1d212c; --line:#272c39; --line-soft:#20242f;
+  --paper:#ecebe6; --muted:#8b93a7; --faint:#5c6478;
+  --amber:#ffb020; --amber-ink:#1a1206; --amber-dim:#2e2410;
+  --jade:#34d399; --rust:#fb7362; --sky:#7db4ff; --violet:#b494ff;
+  --k-sonno:#6660b8; --k-lavoro:#4a6fa5; --k-palestra:#ffb020; --k-casa:#c77d4a;
+  --k-pasto:#7fa25c; --k-libero:#2fb39c; --k-focus:#a97dff; --k-viaggio:#4d5468; --k-riposo:#8b93a7;
+  --r:16px; --r-sm:10px; --r-xs:8px;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,system-ui,sans-serif;
+  --shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 10px 30px rgba(0,0,0,.35);
+  --pad:16px;
+}
+[data-theme="light"]{
+  --void:#f2f1ed; --panel:#ffffff; --inset:#f5f4f0; --line:#e2e0d9; --line-soft:#ecebe5;
+  --paper:#191b20; --muted:#6a7182; --faint:#949aa8;
+  --amber:#b97300; --amber-ink:#fff8ec; --amber-dim:#fbf0dc;
+  --jade:#0e8f66; --rust:#cf3b2e; --sky:#2f6fed; --violet:#7c5cd4;
+  --k-sonno:#6660b8; --k-lavoro:#3e6796; --k-palestra:#e09000; --k-casa:#b96a34;
+  --k-pasto:#6a8c48; --k-libero:#12907d; --k-focus:#8a5df0; --k-viaggio:#9aa0ad; --k-riposo:#7a8194;
+  --shadow:0 1px 2px rgba(20,25,40,.06), 0 8px 24px rgba(20,25,40,.06);
+}
+
+/* ============ BASE ============ */
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(1100px 560px at 12% -8%, color-mix(in srgb, var(--amber) 7%, transparent), transparent 60%),
+    radial-gradient(900px 520px at 104% 4%, color-mix(in srgb, var(--sky) 6%, transparent), transparent 62%),
+    var(--void);
+  background-attachment:fixed;
+  color:var(--paper); font-family:var(--sans); font-size:15px; line-height:1.45;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  padding-bottom:calc(84px + env(safe-area-inset-bottom));
+  overscroll-behavior-y:none;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0}
+a{color:var(--amber)}
+::selection{background:var(--amber);color:var(--amber-ink)}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px;border-radius:6px}
+.shell{max-width:1080px;margin:0 auto;padding:0 var(--pad)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.eyebrow{font:700 10px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+.muted{color:var(--muted)}
+.tiny{font-size:12px}
+.hidden{display:none!important}
+
+/* ============ HEADER ============ */
+.top{
+  position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--void) 88%,transparent);
+  backdrop-filter:saturate(140%) blur(14px);border-bottom:1px solid var(--line-soft);
+}
+.top-in{max-width:1080px;margin:0 auto;padding:12px var(--pad) 11px;display:flex;align-items:center;gap:14px}
+.brand{display:flex;flex-direction:column;gap:3px;min-width:0}
+.brand .eyebrow{display:flex;align-items:center;gap:6px}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 0 var(--amber);animation:pulse 2.6s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--amber) 60%,transparent)}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.brand h1{margin:0;font-size:17px;font-weight:800;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.clock{font-family:var(--mono);font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.icon-btn{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);display:grid;place-items:center;font-size:14px;color:var(--muted);background:var(--panel)}
+.icon-btn:hover{color:var(--paper);border-color:var(--faint)}
+.saveflag{font:700 10px/1 var(--mono);letter-spacing:.14em;color:var(--jade);opacity:0;transition:opacity .25s;text-transform:uppercase}
+.saveflag.on{opacity:1}
+
+/* ============ LAYOUT ============ */
+.view{display:none;padding:18px 0 10px;animation:fade .22s ease}
+.view.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.stack{display:flex;flex-direction:column;gap:14px}
+.cols{display:grid;gap:14px}
+@media(min-width:860px){ .cols.two{grid-template-columns:1fr 1fr} .cols.three{grid-template-columns:repeat(3,1fr)} }
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:var(--pad);box-shadow:var(--shadow)}
+.card.flat{box-shadow:none;background:transparent;border-style:dashed}
+.card-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.card-head h2{margin:0;font-size:14px;font-weight:800;letter-spacing:-.01em}
+.card-head .eyebrow{margin-right:auto}
+.card-head .right{margin-left:auto;display:flex;align-items:center;gap:8px}
+
+/* ============ BUTTONS ============ */
+.btn{
+  border:1px solid var(--line);background:var(--inset);border-radius:var(--r-sm);
+  padding:9px 12px;font-size:13px;font-weight:700;color:var(--paper);
+  display:inline-flex;align-items:center;gap:7px;transition:.15s;white-space:nowrap
+}
+.btn:hover{border-color:var(--faint);transform:translateY(-1px)}
+.btn:active{transform:none}
+.btn.solid{background:var(--amber);color:var(--amber-ink);border-color:var(--amber)}
+.btn.ok{background:color-mix(in srgb,var(--jade) 15%,transparent);border-color:color-mix(in srgb,var(--jade) 40%,transparent);color:var(--jade)}
+.btn.warn{color:var(--rust);border-color:color-mix(in srgb,var(--rust) 35%,transparent)}
+.btn.sm{padding:6px 9px;font-size:12px}
+.btn.wide{width:100%;justify-content:center}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.row-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+/* ============ INPUTS ============ */
+.inp{
+  background:var(--inset);border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:9px 11px;font-size:14px;width:100%;min-width:0;transition:.15s
+}
+.inp:focus{outline:none;border-color:var(--amber);background:var(--panel)}
+.inp.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.inp.ghost{background:transparent;border-color:transparent;padding:6px 6px}
+.inp.ghost:hover{border-color:var(--line-soft)}
+.inp.ghost:focus{border-color:var(--amber);background:var(--inset)}
+select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 15px) 50%,calc(100% - 10px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:30px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font:700 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.addrow{display:flex;gap:8px;margin-top:12px}
+
+/* ============ NOW / HERO ============ */
+.hero{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px var(--pad);box-shadow:var(--shadow);position:relative;overflow:hidden}
+.hero:before{content:"";position:absolute;inset:0 0 auto 0;height:2px;background:var(--kc,var(--amber))}
+.now-top{display:flex;align-items:flex-start;gap:14px}
+.now-label{flex:1;min-width:0}
+.now-title{font-size:26px;font-weight:850;letter-spacing:-.035em;margin:5px 0 3px;line-height:1.1}
+.now-span{font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.countdown{text-align:right;flex:none}
+.countdown b{display:block;font-family:var(--mono);font-size:23px;font-weight:700;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.bar{height:6px;background:var(--inset);border-radius:99px;overflow:hidden;margin:14px 0 6px}
+.bar i{display:block;height:100%;background:var(--kc,var(--amber));border-radius:99px;transition:width .5s ease}
+.now-foot{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--muted)}
+.now-foot b{color:var(--paper);font-weight:700}
+
+/* ============ SUGGESTION ============ */
+.suggest{display:flex;align-items:center;gap:13px;background:linear-gradient(90deg,var(--amber-dim),transparent 70%);border:1px solid color-mix(in srgb,var(--amber) 32%,transparent);border-radius:var(--r);padding:14px var(--pad)}
+.suggest .txt{flex:1;min-width:0}
+.suggest .txt b{display:block;font-size:15px;font-weight:800;letter-spacing:-.02em}
+.suggest .txt span{font-size:12px;color:var(--muted)}
+
+/* ============ LISTS ============ */
+.list{display:flex;flex-direction:column}
+.item{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--line-soft)}
+.item:last-child{border-bottom:0;padding-bottom:0}
+.item:first-child{padding-top:0}
+.tick{width:22px;height:22px;border-radius:7px;border:2px solid var(--line);flex:none;transition:.15s;position:relative;background:var(--inset)}
+.tick:hover{border-color:var(--amber)}
+.item.done .tick{background:var(--jade);border-color:var(--jade)}
+.item.done .tick:after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid var(--void);border-width:0 2px 2px 0;transform:rotate(42deg)}
+.item .txt{flex:1;min-width:0;font-size:14px}
+.item.done .txt{color:var(--faint);text-decoration:line-through}
+.item .meta{font:600 11px/1 var(--mono);color:var(--faint);white-space:nowrap}
+.del{width:26px;height:26px;border-radius:7px;color:var(--faint);flex:none;display:grid;place-items:center;font-size:15px;line-height:1}
+.del:hover{color:var(--rust);background:color-mix(in srgb,var(--rust) 12%,transparent)}
+.grip{font:700 10px/1 var(--mono);color:var(--faint);width:16px;flex:none;text-align:center}
+
+/* ============ BADGES ============ */
+.badge{font:700 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:5px 7px;border-radius:6px;white-space:nowrap;border:1px solid transparent}
+.b-late{background:color-mix(in srgb,var(--rust) 16%,transparent);color:var(--rust);border-color:color-mix(in srgb,var(--rust) 30%,transparent)}
+.b-now{background:var(--amber-dim);color:var(--amber);border-color:color-mix(in srgb,var(--amber) 35%,transparent)}
+.b-soon{background:var(--inset);color:var(--muted);border-color:var(--line)}
+.b-ok{background:color-mix(in srgb,var(--jade) 13%,transparent);color:var(--jade);border-color:color-mix(in srgb,var(--jade) 28%,transparent)}
+
+/* ============ STATS ============ */
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+@media(min-width:560px){.kpis{grid-template-columns:repeat(4,1fr)}}
+.kpi{background:var(--inset);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px}
+.kpi b{display:block;font-family:var(--mono);font-size:22px;font-weight:700;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.kpi small{font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.12em;font-weight:700;font-family:var(--mono)}
+.bars{display:flex;align-items:flex-end;gap:5px;height:92px;margin-top:14px}
+.bars .b{flex:1;background:var(--inset);border-radius:4px 4px 2px 2px;position:relative;display:flex;align-items:flex-end;overflow:hidden;min-height:4px}
+.bars .b i{display:block;width:100%;background:var(--amber);border-radius:3px;transition:height .5s}
+.bars .b.hi i{background:var(--jade)}
+.bar-labels{display:flex;gap:5px;margin-top:5px}
+.bar-labels span{flex:1;text-align:center;font:600 9px/1 var(--mono);color:var(--faint)}
+
+/* dots */
+.dots{display:flex;gap:6px}
+.dot{width:26px;height:26px;border-radius:8px;border:1.5px solid var(--line);background:var(--inset);display:grid;place-items:center;font:700 10px/1 var(--mono);color:var(--faint)}
+.dot.on{background:var(--amber);border-color:var(--amber);color:var(--amber-ink)}
+.dot.plan{border-color:color-mix(in srgb,var(--amber) 50%,transparent);color:var(--amber)}
+
+/* ============ EDITOR ROWS ============ */
+.erow{display:grid;gap:7px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line-soft)}
+.erow:last-child{border-bottom:0}
+.erow.block{grid-template-columns:84px 118px 1fr 30px}
+.erow.check{grid-template-columns:1fr 110px 30px}
+.erow.chore{grid-template-columns:1fr 74px 74px 30px}
+.erow.ex{grid-template-columns:1fr 62px 68px 30px}
+@media(max-width:620px){
+  .erow.block{grid-template-columns:84px 1fr 30px}
+  .erow.block>*:nth-child(1){grid-column:1;grid-row:1}
+  .erow.block>*:nth-child(2){grid-column:2;grid-row:1}
+  .erow.block>*:nth-child(3){grid-column:1/3;grid-row:2}
+  .erow.block>*:nth-child(4){grid-column:3;grid-row:1}
+  .erow.chore{grid-template-columns:1fr 64px 64px 28px}
+  .erow.ex{grid-template-columns:1fr 54px 58px 28px}
+}
+.daychips{display:flex;gap:4px;flex-wrap:wrap}
+.dchip{width:28px;height:26px;border-radius:7px;border:1px solid var(--line);background:var(--inset);font:700 10px/1 var(--mono);color:var(--faint);text-transform:uppercase}
+.dchip.on{background:var(--amber);border-color:var(--amber);color:var(--amber-ink)}
+
+/* ============ NAV ============ */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:color-mix(in srgb,var(--void) 92%,transparent);backdrop-filter:blur(16px) saturate(140%);border-top:1px solid var(--line)}
+.tabbar-in{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr);padding:8px 4px calc(8px + env(safe-area-inset-bottom))}
+.tab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 1px;border-radius:10px;color:var(--faint);font:700 9px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;transition:.15s;overflow:hidden}
+@media(max-width:400px){.tab{font-size:8px;letter-spacing:0}.tab svg{width:17px;height:17px}}
+.tab svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.tab.on{color:var(--amber)}
+.tab:hover{color:var(--paper)}
+
+/* ============ IL QUADERNO ============ */
+.pad{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  padding:24px 20px 22px 34px;box-shadow:var(--shadow);position:relative}
+.pad:before{content:"";position:absolute;left:19px;top:16px;bottom:16px;width:1px;
+  background:color-mix(in srgb,var(--rust) 45%,transparent)}
+.pad-h{text-align:center;font-size:15px;font-weight:850;letter-spacing:.12em;text-transform:uppercase;
+  margin:0 0 4px;padding-bottom:12px;border-bottom:2px solid var(--paper)}
+.pad-date{display:flex;align-items:center;justify-content:center;gap:12px;margin:18px 0 2px}
+.cal{width:46px;border:1.5px solid var(--line);border-radius:9px;overflow:hidden;background:var(--inset);
+  text-align:center;flex:none;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.cal .cal-top{position:relative;display:block;height:9px;background:color-mix(in srgb,var(--rust) 78%,transparent)}
+.cal .cal-top:before,.cal .cal-top:after{content:"";position:absolute;top:2.5px;width:3.5px;height:3.5px;
+  border-radius:50%;background:var(--panel)}
+.cal .cal-top:before{left:11px}
+.cal .cal-top:after{right:11px}
+.cal b{display:block;font-family:var(--mono);font-size:21px;font-weight:800;letter-spacing:-.04em;
+  padding:7px 0 8px;font-variant-numeric:tabular-nums}
+.pad-date-txt{text-align:left;line-height:1.3}
+.pad-date-txt b{display:block;font-size:14px;font-weight:750;letter-spacing:-.01em}
+.pad-date-txt span{display:block;font:600 11px/1 var(--mono);color:var(--faint);margin-top:3px}
+.pad-date-txt i{display:block;font:700 8.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--amber);font-style:normal;margin-top:6px}
+.pad-s{margin-top:26px}
+.pad-s:first-of-type{margin-top:20px}
+.pad-s>h3{display:inline-block;margin:0 0 12px;font-size:12.5px;font-weight:800;letter-spacing:.13em;
+  text-transform:uppercase;border-bottom:1.5px solid var(--paper);padding-bottom:3px}
+.pad-item{border-bottom:1px dotted var(--line);padding:3px 0}
+.pad-item:last-child{border-bottom:0}
+.pad-row{display:grid;grid-template-columns:14px 1fr 92px 24px;gap:6px;align-items:center;padding:4px 0}
+.pad-row .dash{font-family:var(--mono);color:var(--faint);font-size:13px;text-align:center}
+.pad-row .eur{font:700 12px/1 var(--mono);color:var(--faint);text-align:center}
+.pad-note{padding:0 26px 4px 20px}
+.pad-note input{width:100%;background:transparent;border:0;border-bottom:1px dotted transparent;
+  font-size:11.5px;color:var(--faint);font-style:italic;padding:2px 0}
+.pad-note input:hover{border-bottom-color:var(--line)}
+.pad-note input:focus{outline:none;border-bottom-color:var(--amber);color:var(--muted)}
+.pad-row .inp.ghost{font-size:13.5px;padding:5px 4px}
+.pad-row .inp.mono{font-size:13.5px;padding:5px 6px;text-align:right;font-weight:700}
+.pad-totline{display:flex;justify-content:flex-end;margin-top:12px}
+.pad-tot{display:inline-flex;align-items:baseline;gap:8px;border:1.5px solid var(--paper);border-radius:5px;
+  padding:7px 14px;font-family:var(--mono);font-size:14px;font-weight:800;font-variant-numeric:tabular-nums}
+.pad-tot small{font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.pad-add{display:flex;gap:7px;margin-top:12px}
+.pad-add .inp{font-size:13px;padding:7px 9px}
+.pad-calc{margin-top:12px;border-left:2px solid var(--amber);padding:2px 0 2px 13px}
+.pad-calc div{display:flex;justify-content:space-between;gap:12px;font-size:13px;padding:5px 0}
+.pad-calc div span:last-child{font-family:var(--mono);font-weight:700;font-variant-numeric:tabular-nums}
+.pad-calc div.sum{border-top:1px solid var(--line);margin-top:5px;padding-top:9px;font-weight:800}
+.pad-calc div.sum span:last-child{font-size:15px}
+.pad-goal{display:grid;grid-template-columns:14px 30px 1fr 24px;gap:8px;align-items:center;padding:2px 0}
+.pad-goal .gname{font-size:13.5px;padding:5px 4px}
+.gring{width:30px;height:30px;position:relative;flex:none}
+.gring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.gring .gt{fill:none;stroke:var(--inset);stroke-width:4}
+.gring .gf{fill:none;stroke:var(--gc,var(--amber));stroke-width:4;stroke-linecap:round;
+  transition:stroke-dashoffset 1s cubic-bezier(.22,.9,.25,1)}
+.gring b{position:absolute;inset:0;display:grid;place-items:center;font:800 8.5px/1 var(--mono);color:var(--gc,var(--amber))}
+.gring b.inf{font-size:13px}
+.pad-manca{padding:0 26px 5px 60px;font:600 11px/1.3 var(--mono);color:var(--faint)}
+.pad-manca b{color:var(--muted)}
+.pad-fields{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:2px 26px 8px 60px}
+.pad-fields label{display:block;font:700 8.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;
+  color:var(--faint);margin-bottom:4px}
+.pad-fields .inp{font-size:12.5px;padding:6px 7px;text-align:right;font-weight:700}
+@media(max-width:520px){
+  .pad-manca,.pad-fields{padding-left:24px;padding-right:0}
+  .pad-fields{gap:5px}
+  .pad-fields .inp{font-size:11.5px;padding:5px 5px}
+}
+@media(max-width:520px){
+  .pad{padding:20px 14px 18px 28px}
+  .pad:before{left:14px}
+  .pad-row{grid-template-columns:12px 1fr 78px 22px}
+  .pad-goal,.pad-head{grid-template-columns:12px 1fr 72px 72px 22px}
+  .pad-head span{font-size:8px;letter-spacing:.06em}
+}
+
+/* ============ WALLET REAL ============ */
+.wallet{position:relative;overflow:hidden;border-color:color-mix(in srgb,var(--jade) 30%,var(--line))}
+.wallet:before{content:"";position:absolute;right:-70px;top:-70px;width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(circle,color-mix(in srgb,var(--jade) 15%,transparent),transparent 65%);pointer-events:none}
+.wallet .wnum{font-family:var(--mono);font-size:38px;font-weight:800;letter-spacing:-.045em;line-height:1;
+  color:var(--jade);font-variant-numeric:tabular-nums;margin:8px 0 6px;position:relative}
+@media(max-width:480px){.wallet .wnum{font-size:31px}}
+.wallet .wsub{font-size:13px;color:var(--muted);position:relative;line-height:1.5}
+.wallet .wsub b{color:var(--paper)}
+.spark{display:flex;align-items:flex-end;gap:5px;height:66px;margin-top:16px}
+.spark .sb{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%;min-width:0}
+.spark .sb i{display:block;width:100%;background:color-mix(in srgb,var(--jade) 32%,transparent);border-radius:4px 4px 2px 2px;
+  transition:height 1s cubic-bezier(.22,.9,.25,1);min-height:3px}
+.spark .sb.now i{background:var(--jade)}
+.spark-lab{display:flex;gap:5px;margin-top:6px}
+.spark-lab span{flex:1;text-align:center;font:600 9px/1 var(--mono);color:var(--faint);min-width:0;overflow:hidden}
+
+/* ============ STRISCIA NUMERI CHIAVE ============ */
+.strip{display:flex;align-items:stretch;margin-top:20px;border-top:1px solid var(--line-soft);padding-top:16px;position:relative}
+.strip>div{flex:1;text-align:center;padding:0 6px;position:relative}
+.strip>div+div:before{content:"";position:absolute;left:0;top:12%;bottom:12%;width:1px;background:var(--line-soft)}
+.strip b{display:block;font-family:var(--mono);font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.strip small{display:block;font:700 8.5px/1.3 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-top:4px}
+@media(max-width:470px){.strip b{font-size:12.5px}.strip small{font-size:7px;letter-spacing:.05em}.strip>div{padding:0 3px}}
+
+/* ============ SEMAFORO DI STATO ============ */
+.status{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:99px;
+  font:700 11.5px/1 var(--sans);border:1px solid;margin-bottom:2px}
+.status i{width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+.status.ok{color:var(--jade);border-color:color-mix(in srgb,var(--jade) 34%,transparent);background:color-mix(in srgb,var(--jade) 10%,transparent)}
+.status.occhio{color:var(--amber);border-color:color-mix(in srgb,var(--amber) 38%,transparent);background:var(--amber-dim)}
+.status.attenzione{color:var(--rust);border-color:color-mix(in srgb,var(--rust) 34%,transparent);background:color-mix(in srgb,var(--rust) 10%,transparent)}
+
+/* ============ LE TRE FAMIGLIE ============ */
+.fam{margin-top:4px}
+.fam-bar{display:flex;height:34px;border-radius:10px;overflow:hidden;border:1px solid var(--line-soft);background:var(--inset)}
+.fam-bar i{display:block;background:var(--fc);transition:width 1s cubic-bezier(.22,.9,.25,1);position:relative}
+.fam-bar i+i{border-left:1px solid color-mix(in srgb,var(--void) 45%,transparent)}
+.fam-leg{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;margin-top:14px}
+.fam-leg>div{border-left:3px solid var(--fc);padding-left:10px}
+.fam-leg b{display:block;font-size:12.5px;font-weight:750}
+.fam-leg .fv{font-family:var(--mono);font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:2px}
+.fam-leg small{display:block;font-size:10.5px;color:var(--faint);margin-top:2px;line-height:1.35}
+
+/* ============ REVISIONE SETTIMANALE ============ */
+.review{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);overflow:hidden;box-shadow:var(--shadow)}
+.review-top{padding:16px 18px 14px;background:linear-gradient(160deg,color-mix(in srgb,var(--sky) 12%,transparent),transparent 75%);
+  border-bottom:1px dashed var(--line)}
+.review-top .eyebrow{margin-bottom:7px}
+.review-top h3{margin:0;font-size:17px;letter-spacing:-.02em}
+.review-body{padding:14px 18px 16px}
+.review-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;font-size:13px;border-bottom:1px solid var(--line-soft)}
+.review-row:last-of-type{border-bottom:0}
+.review-row .rv{font-family:var(--mono);font-weight:700;font-variant-numeric:tabular-nums}
+.review-end{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.review-end .rmsg{flex:1;min-width:170px;font-size:13px;font-weight:700}
+
+/* ============ RISPARMIO 72H ============ */
+.saved{display:flex;align-items:center;gap:12px;background:color-mix(in srgb,var(--jade) 9%,transparent);
+  border:1px solid color-mix(in srgb,var(--jade) 28%,transparent);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:14px}
+.saved b{font-family:var(--mono);font-size:19px;font-weight:800;color:var(--jade);letter-spacing:-.03em}
+.saved span{font-size:12px;color:var(--muted);line-height:1.4}
+
+/* ============ MISC ============ */
+.empty{text-align:center;padding:22px 10px;color:var(--faint);font-size:13px}
+.empty b{display:block;color:var(--muted);font-size:14px;margin-bottom:4px;font-weight:700}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom));background:var(--paper);color:var(--void);padding:10px 16px;border-radius:99px;font-size:13px;font-weight:700;z-index:60;box-shadow:0 12px 30px rgba(0,0,0,.4);animation:up .25s ease}
+@keyframes up{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+.modal{position:fixed;inset:0;background:color-mix(in srgb,var(--void) 78%,transparent);backdrop-filter:blur(4px);display:grid;place-items:center;padding:18px;z-index:70;animation:fade .2s}
+.sheet{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:22px;max-width:440px;width:100%;box-shadow:0 30px 70px rgba(0,0,0,.5)}
+.sheet h3{margin:6px 0 4px;font-size:20px;letter-spacing:-.02em}
+.big-timer{font-family:var(--mono);font-size:60px;font-weight:700;letter-spacing:-.05em;text-align:center;margin:18px 0 6px;font-variant-numeric:tabular-nums}
+.note{background:var(--inset);border-left:2px solid var(--amber);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:11px 13px;font-size:12.5px;color:var(--muted);line-height:1.5}
+.note b{color:var(--paper)}
+.split-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.split-tabs::-webkit-scrollbar{height:0}
+.stab{padding:8px 12px;border-radius:99px;border:1px solid var(--line);background:var(--inset);font-size:12px;font-weight:700;white-space:nowrap}
+.stab.on{background:var(--paper);color:var(--void);border-color:var(--paper)}
+hr.sep{border:0;border-top:1px solid var(--line-soft);margin:16px 0}
+.inline-add{display:flex;gap:8px;align-items:center;margin-top:10px}
+@media(max-width:480px){.now-title{font-size:19px}.countdown b{font-size:17px}.clock{font-size:17px}.gauge{width:58px;height:58px}.gauge .txt b{font-size:14px}.gauge .txt small{display:none}.now-top{gap:10px}}
+
+/* ============ GAUGE (SVG radiale) ============ */
+.gauge{position:relative;width:74px;height:74px;flex:none}
+.gauge svg{width:100%;height:100%;transform:rotate(-90deg)}
+.gauge .track{fill:none;stroke:var(--inset);stroke-width:7}
+.gauge .fill{fill:none;stroke:var(--gc,var(--amber));stroke-width:7;stroke-linecap:round;
+  transition:stroke-dashoffset 1s cubic-bezier(.22,.9,.25,1), stroke .5s}
+.gauge .txt{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.gauge .txt b{font-family:var(--mono);font-size:18px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.gauge .txt small{display:block;font:700 8px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.gauge.mini{width:46px;height:46px}
+.gauge.mini .track,.gauge.mini .fill{stroke-width:6}
+.gauge.mini .txt b{font-size:12px}
+.gauge.mini .txt small{display:none}
+
+/* ============ MINI GRAPH ============ */
+.chart-wrap svg{display:block;width:100%;height:auto;overflow:visible}
+.chart-label{font:600 9px/1 var(--mono)}
+
+/* ============ ICONS ============ */
+.ic{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:-2.5px;margin-right:5px;opacity:.85}
+.card-head .eyebrow{display:flex;align-items:center}
+
+/* ============ LOADER ============ */
+.loadscreen{position:fixed;inset:0;z-index:200;background:var(--void);display:grid;place-items:center;gap:12px;transition:opacity .5s ease, visibility .5s}
+.loadscreen.gone{opacity:0;visibility:hidden;pointer-events:none}
+.loadscreen .mark{width:50px;height:50px;border-radius:13px;border:1.5px solid var(--line);display:grid;place-items:center;position:relative}
+.loadscreen .mark:before{content:"";position:absolute;inset:-2px;border-radius:15px;border:2px solid transparent;border-top-color:var(--amber);border-right-color:color-mix(in srgb,var(--amber) 30%,transparent);animation:spin .9s linear infinite}
+.loadscreen .mark i{font:800 17px/1 var(--mono);color:var(--amber);font-style:normal}
+.loadscreen .txt{font:700 10.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.skel{background:linear-gradient(90deg,var(--inset) 25%,var(--line-soft) 40%,var(--inset) 60%);background-size:400% 100%;animation:shimmer 1.6s ease infinite;border-radius:8px;color:transparent!important}
+@keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+
+/* ============ PRINT REPORT ============ */
+.report{display:none}
+.rp-head{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #15181f;padding-bottom:10px;margin-bottom:18px}
+.rp-head h1{margin:0;font-size:21px;letter-spacing:-.02em}
+.rp-head span{font:600 10.5px var(--mono);color:#666}
+.rp-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:18px}
+.rp-kpi{border:1px solid #ddd;border-radius:8px;padding:9px 11px}
+.rp-kpi b{display:block;font-size:19px;font-family:var(--mono)}
+.rp-kpi small{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#777}
+.rp-sec{margin-bottom:16px;break-inside:avoid}
+.rp-sec h2{font-size:12px;text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid #ddd;padding-bottom:5px;margin:0 0 7px;color:#222}
+.rp-row{display:flex;justify-content:space-between;gap:10px;font-size:12px;padding:5px 0;border-bottom:1px dotted #e3e3e3;color:#222}
+.rp-row span:last-child{color:#666;white-space:nowrap;font-family:var(--mono);font-size:11px}
+.rp-empty{font-size:11.5px;color:#999;padding:4px 0}
+.rp-foot{margin-top:20px;font-size:9.5px;color:#999;text-align:center}
+@media print{
+  @page{margin:14mm}
+  body *{visibility:hidden}
+  .report,.report *{visibility:visible}
+  .report{display:block!important;position:absolute;left:0;top:0;width:100%;background:#fff;color:#15181f;padding:0;font-family:var(--sans)}
+}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+
+/* ============ BUSTE ============ */
+.env{padding:12px 0;border-bottom:1px solid var(--line-soft)}
+.env:last-child{border-bottom:0;padding-bottom:2px}
+.env-top{display:flex;align-items:baseline;gap:9px;margin-bottom:7px}
+.env-top .nm{font-size:13.5px;font-weight:650;flex:1;min-width:0}
+.env-top .vl{font-family:var(--mono);font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums}
+.env-top .tg{font:600 11px/1 var(--mono);color:var(--faint)}
+.env-bar{height:6px;background:var(--inset);border-radius:99px;overflow:hidden}
+.env-bar i{display:block;height:100%;border-radius:99px;background:var(--ec,var(--amber));transition:width .8s cubic-bezier(.22,.9,.25,1)}
+
+/* ============ MOVIMENTI ============ */
+.mov{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--line-soft)}
+.mov:last-child{border-bottom:0}
+.mov .mk{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:var(--inset);flex:none;border:1px solid var(--line)}
+.mov .mk svg{width:15px;height:15px;stroke:var(--mc,var(--muted));fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mov .mi{flex:1;min-width:0}
+.mov .mi b{display:block;font-size:13.5px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mov .mi span{font:600 11px/1 var(--mono);color:var(--faint)}
+.mov .mv{font-family:var(--mono);font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.mov .mv.in{color:var(--jade)}
+
+/* ============ CHIPS CATEGORIA ============ */
+.catrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.cchip{padding:7px 11px;border-radius:99px;border:1px solid var(--line);background:var(--inset);font-size:12px;font-weight:700;transition:.15s}
+.cchip.on{background:var(--amber);border-color:var(--amber);color:var(--amber-ink)}
+.cchip:hover{border-color:var(--faint)}
+
+/* ============ DONUT ============ */
+.donut-wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.donut{width:150px;height:150px;flex:none;position:relative}
+.donut svg{width:100%;height:100%;transform:rotate(-90deg)}
+.donut .dseg{fill:none;stroke-width:17;transition:stroke-dasharray .9s cubic-bezier(.22,.9,.25,1)}
+.donut .dc{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.donut .dc b{font-family:var(--mono);font-size:17px;font-weight:800;letter-spacing:-.03em}
+.donut .dc small{display:block;font:700 8px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-top:3px}
+.dlegend{flex:1;min-width:180px;display:flex;flex-direction:column;gap:6px}
+.dl{display:flex;align-items:center;gap:8px;font-size:12.5px}
+.dl i{width:9px;height:9px;border-radius:3px;background:var(--dc);flex:none}
+.dl .n{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dl .v{font-family:var(--mono);font-weight:700;font-variant-numeric:tabular-nums}
+.dl .p{font:600 10.5px var(--mono);color:var(--faint);width:34px;text-align:right}
+
+/* ============ BARRE ORIZZONTALI ============ */
+.hbar{margin-bottom:11px}
+.hbar-top{display:flex;justify-content:space-between;gap:9px;font-size:12.5px;margin-bottom:5px}
+.hbar-top .v{font-family:var(--mono);font-weight:700;font-variant-numeric:tabular-nums}
+.hbar-track{height:8px;background:var(--inset);border-radius:99px;overflow:hidden}
+.hbar-track i{display:block;height:100%;border-radius:99px;background:var(--hc,var(--amber));transition:width .8s cubic-bezier(.22,.9,.25,1)}
+
+/* ============ SELETTORE MESE ============ */
+.mpick{display:flex;align-items:center;gap:9px}
+.mpick b{font-family:var(--mono);font-size:14px;font-weight:800;min-width:112px;text-align:center;text-transform:capitalize}
+.mnav{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--inset);display:grid;place-items:center;color:var(--muted);font-size:14px}
+.mnav:hover{color:var(--paper);border-color:var(--faint)}
+.mnav:disabled{opacity:.3;cursor:not-allowed}
+
+/* ============ RIGHE EDITOR SOLDI ============ */
+.erow.money{grid-template-columns:1fr 108px 30px}
+.erow.busta{grid-template-columns:1fr 100px 100px 30px}
+@media(max-width:620px){.erow.money{grid-template-columns:1fr 88px 28px}.erow.busta{grid-template-columns:1fr 78px 78px 28px}}
+
+/* ============ RIGA SPESA FISSA ============ */
+.fx{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--line-soft)}
+.fx:last-child{border-bottom:0}
+.fx .nm{flex:1;min-width:0;font-size:13.5px}
+.fx.paid .nm{color:var(--faint);text-decoration:line-through}
+.fx .amt{font-family:var(--mono);font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums}
+
+
+/* ============ IL NUMERO DEL GIORNO ============ */
+.today{position:relative;text-align:center;padding:30px 18px 26px;overflow:hidden}
+.today:before{content:"";position:absolute;left:50%;top:-40%;transform:translateX(-50%);
+  width:min(460px,120%);aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle,color-mix(in srgb,var(--tc,var(--jade)) 16%,transparent),transparent 62%);pointer-events:none}
+.today .lab{font:700 10px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--muted);position:relative}
+.today .big{font-family:var(--mono);font-weight:800;font-size:66px;letter-spacing:-.055em;line-height:1;
+  margin:12px 0 6px;font-variant-numeric:tabular-nums;position:relative;color:var(--tc,var(--paper))}
+.today .sub{font-size:13.5px;color:var(--muted);position:relative;max-width:380px;margin:0 auto}
+.today .sub b{color:var(--paper)}
+@media(max-width:480px){.today .big{font-size:52px}.today{padding:24px 12px 22px}}
+
+/* ============ TERMOMETRO DEL RITMO ============ */
+.pace{margin-top:22px;position:relative}
+.pace-track{height:10px;border-radius:99px;background:var(--inset);overflow:hidden;position:relative;border:1px solid var(--line-soft)}
+.pace-track i{display:block;height:100%;border-radius:99px;background:var(--pc,var(--jade));
+  transition:width 1s cubic-bezier(.22,.9,.25,1)}
+.pace-mark{position:absolute;top:-5px;bottom:-5px;width:2px;background:var(--paper);border-radius:2px;opacity:.85}
+.pace-mark:after{content:"";position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);
+  border-left:3.5px solid transparent;border-right:3.5px solid transparent;border-bottom:4px solid var(--paper)}
+.pace-legend{display:flex;justify-content:space-between;margin-top:9px;font:600 11px/1 var(--mono);color:var(--faint)}
+
+/* ============ PRESET RAPIDI ============ */
+.presets{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;margin-top:12px}
+.pre{border:1px solid var(--line);background:var(--inset);border-radius:12px;padding:11px 10px;text-align:left;transition:.15s}
+.pre:hover{border-color:var(--amber);transform:translateY(-2px)}
+.pre:active{transform:none}
+.pre b{display:block;font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pre span{font:700 11px/1 var(--mono);color:var(--amber);display:block;margin-top:3px}
+.pre.add{border-style:dashed;display:grid;place-items:center;color:var(--faint);font-size:19px}
+
+/* ============ NUDGE ============ */
+.nudge{display:flex;gap:12px;align-items:flex-start;border-radius:var(--r);padding:14px 16px;border:1px solid var(--line);background:var(--panel)}
+.nudge.warm{border-color:color-mix(in srgb,var(--amber) 34%,transparent);background:linear-gradient(100deg,var(--amber-dim),transparent 72%)}
+.nudge.calm{border-color:color-mix(in srgb,var(--jade) 30%,transparent);background:linear-gradient(100deg,color-mix(in srgb,var(--jade) 9%,transparent),transparent 72%)}
+.nudge .ni{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:none;background:var(--inset);border:1px solid var(--line)}
+.nudge .ni svg{width:16px;height:16px;stroke:var(--nc,var(--muted));fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.nudge .nt{flex:1;min-width:0}
+.nudge .nt b{display:block;font-size:14px;font-weight:750;letter-spacing:-.01em;margin-bottom:2px}
+.nudge .nt span{font-size:12.5px;color:var(--muted);line-height:1.45}
+.nudge .na{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+
+/* ============ OBIETTIVI ============ */
+.goal{padding:15px 0;border-bottom:1px solid var(--line-soft)}
+.goal:last-child{border-bottom:0;padding-bottom:2px}
+.goal-h{display:flex;align-items:baseline;gap:10px;margin-bottom:9px}
+.goal-h .gn{font-size:14px;font-weight:700;flex:1;min-width:0;letter-spacing:-.01em}
+.goal-h .gv{font-family:var(--mono);font-size:14px;font-weight:800;font-variant-numeric:tabular-nums}
+.goal-h .gt{font:600 11.5px/1 var(--mono);color:var(--faint)}
+.goal-bar{height:9px;border-radius:99px;background:var(--inset);overflow:hidden;position:relative}
+.goal-bar i{display:block;height:100%;border-radius:99px;background:var(--gc,var(--amber));transition:width 1s cubic-bezier(.22,.9,.25,1)}
+.goal-bar.done i{background:var(--jade)}
+.goal-f{display:flex;justify-content:space-between;gap:10px;margin-top:8px;font-size:11.5px;color:var(--faint)}
+.goal-f b{color:var(--muted);font-weight:700}
+.goal-edit{display:none;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+.goal.open .goal-edit{display:block}
+.gedit-grid{display:grid;gap:8px;grid-template-columns:1fr 92px 92px}
+@media(max-width:560px){.gedit-grid{grid-template-columns:1fr 1fr}}
+
+/* ============ VOGLIE (regola delle 72 ore) ============ */
+.wish{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line-soft)}
+.wish:last-child{border-bottom:0}
+.wish .wr{width:38px;height:38px;flex:none;position:relative}
+.wish .wr svg{width:100%;height:100%;transform:rotate(-90deg)}
+.wish .wr .t{fill:none;stroke:var(--inset);stroke-width:5}
+.wish .wr .f{fill:none;stroke:var(--amber);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .8s}
+.wish .wr b{position:absolute;inset:0;display:grid;place-items:center;font:800 10px/1 var(--mono)}
+.wish .wi{flex:1;min-width:0}
+.wish .wi b{display:block;font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wish .wi span{font:600 11px/1 var(--mono);color:var(--faint)}
+.wish.ready .wi span{color:var(--jade)}
+
+/* ============ CASCATA DEL MESE ============ */
+.flow{display:flex;flex-direction:column;gap:2px}
+.flow-row{display:flex;align-items:center;gap:12px;padding:11px 0}
+.flow-row .fbar{height:26px;border-radius:7px;background:var(--fc,var(--amber));min-width:3px;
+  transition:width 1s cubic-bezier(.22,.9,.25,1);flex:none;opacity:.9}
+.flow-row .fl{flex:1;min-width:0;font-size:13px}
+.flow-row .fl small{display:block;font-size:11px;color:var(--faint);margin-top:1px}
+.flow-row .fv{font-family:var(--mono);font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.flow-sep{height:1px;background:var(--line);margin:8px 0}
+
+/* ============ CONTI ============ */
+.acct{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line-soft)}
+.acct:last-child{border-bottom:0}
+.acct .ai{width:34px;height:34px;border-radius:10px;background:var(--inset);border:1px solid var(--line);display:grid;place-items:center;flex:none}
+.acct .ai svg{width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.acct .an{flex:1;min-width:0;font-size:13.5px;font-weight:650}
+.acct .av{font-family:var(--mono);font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* ============ SFIZI: COSTO ANNUO ============ */
+.cat{padding:12px 0;border-bottom:1px solid var(--line-soft)}
+.cat:last-child{border-bottom:0}
+.cat-h{display:flex;align-items:baseline;gap:9px;margin-bottom:7px}
+.cat-h .cn{flex:1;min-width:0;font-size:13.5px;font-weight:650}
+.cat-h .cv{font-family:var(--mono);font-size:13px;font-weight:700}
+.cat-y{font:600 11px/1 var(--mono);color:var(--faint);margin-top:6px}
+
+/* ============ IL QUADERNO ============ */
+.pad{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  padding:24px 20px 22px 34px;box-shadow:var(--shadow);position:relative}
+.pad:before{content:"";position:absolute;left:19px;top:16px;bottom:16px;width:1px;
+  background:color-mix(in srgb,var(--rust) 45%,transparent)}
+.pad-h{text-align:center;font-size:15px;font-weight:850;letter-spacing:.12em;text-transform:uppercase;
+  margin:0 0 4px;padding-bottom:12px;border-bottom:2px solid var(--paper)}
+.pad-date{display:flex;align-items:center;justify-content:center;gap:12px;margin:18px 0 2px}
+.cal{width:46px;border:1.5px solid var(--line);border-radius:9px;overflow:hidden;background:var(--inset);
+  text-align:center;flex:none;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.cal .cal-top{position:relative;display:block;height:9px;background:color-mix(in srgb,var(--rust) 78%,transparent)}
+.cal .cal-top:before,.cal .cal-top:after{content:"";position:absolute;top:2.5px;width:3.5px;height:3.5px;
+  border-radius:50%;background:var(--panel)}
+.cal .cal-top:before{left:11px}
+.cal .cal-top:after{right:11px}
+.cal b{display:block;font-family:var(--mono);font-size:21px;font-weight:800;letter-spacing:-.04em;
+  padding:7px 0 8px;font-variant-numeric:tabular-nums}
+.pad-date-txt{text-align:left;line-height:1.3}
+.pad-date-txt b{display:block;font-size:14px;font-weight:750;letter-spacing:-.01em}
+.pad-date-txt span{display:block;font:600 11px/1 var(--mono);color:var(--faint);margin-top:3px}
+.pad-date-txt i{display:block;font:700 8.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--amber);font-style:normal;margin-top:6px}
+.pad-s{margin-top:26px}
+.pad-s:first-of-type{margin-top:20px}
+.pad-s>h3{display:inline-block;margin:0 0 12px;font-size:12.5px;font-weight:800;letter-spacing:.13em;
+  text-transform:uppercase;border-bottom:1.5px solid var(--paper);padding-bottom:3px}
+.pad-item{border-bottom:1px dotted var(--line);padding:3px 0}
+.pad-item:last-child{border-bottom:0}
+.pad-row{display:grid;grid-template-columns:14px 1fr 92px 24px;gap:6px;align-items:center;padding:4px 0}
+.pad-row .dash{font-family:var(--mono);color:var(--faint);font-size:13px;text-align:center}
+.pad-row .eur{font:700 12px/1 var(--mono);color:var(--faint);text-align:center}
+.pad-note{padding:0 26px 4px 20px}
+.pad-note input{width:100%;background:transparent;border:0;border-bottom:1px dotted transparent;
+  font-size:11.5px;color:var(--faint);font-style:italic;padding:2px 0}
+.pad-note input:hover{border-bottom-color:var(--line)}
+.pad-note input:focus{outline:none;border-bottom-color:var(--amber);color:var(--muted)}
+.pad-row .inp.ghost{font-size:13.5px;padding:5px 4px}
+.pad-row .inp.mono{font-size:13.5px;padding:5px 6px;text-align:right;font-weight:700}
+.pad-totline{display:flex;justify-content:flex-end;margin-top:12px}
+.pad-tot{display:inline-flex;align-items:baseline;gap:8px;border:1.5px solid var(--paper);border-radius:5px;
+  padding:7px 14px;font-family:var(--mono);font-size:14px;font-weight:800;font-variant-numeric:tabular-nums}
+.pad-tot small{font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.pad-add{display:flex;gap:7px;margin-top:12px}
+.pad-add .inp{font-size:13px;padding:7px 9px}
+.pad-calc{margin-top:12px;border-left:2px solid var(--amber);padding:2px 0 2px 13px}
+.pad-calc div{display:flex;justify-content:space-between;gap:12px;font-size:13px;padding:5px 0}
+.pad-calc div span:last-child{font-family:var(--mono);font-weight:700;font-variant-numeric:tabular-nums}
+.pad-calc div.sum{border-top:1px solid var(--line);margin-top:5px;padding-top:9px;font-weight:800}
+.pad-calc div.sum span:last-child{font-size:15px}
+.pad-goal{display:grid;grid-template-columns:14px 30px 1fr 24px;gap:8px;align-items:center;padding:2px 0}
+.pad-goal .gname{font-size:13.5px;padding:5px 4px}
+.gring{width:30px;height:30px;position:relative;flex:none}
+.gring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.gring .gt{fill:none;stroke:var(--inset);stroke-width:4}
+.gring .gf{fill:none;stroke:var(--gc,var(--amber));stroke-width:4;stroke-linecap:round;
+  transition:stroke-dashoffset 1s cubic-bezier(.22,.9,.25,1)}
+.gring b{position:absolute;inset:0;display:grid;place-items:center;font:800 8.5px/1 var(--mono);color:var(--gc,var(--amber))}
+.gring b.inf{font-size:13px}
+.pad-manca{padding:0 26px 5px 60px;font:600 11px/1.3 var(--mono);color:var(--faint)}
+.pad-manca b{color:var(--muted)}
+.pad-fields{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:2px 26px 8px 60px}
+.pad-fields label{display:block;font:700 8.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;
+  color:var(--faint);margin-bottom:4px}
+.pad-fields .inp{font-size:12.5px;padding:6px 7px;text-align:right;font-weight:700}
+@media(max-width:520px){
+  .pad-manca,.pad-fields{padding-left:24px;padding-right:0}
+  .pad-fields{gap:5px}
+  .pad-fields .inp{font-size:11.5px;padding:5px 5px}
+}
+@media(max-width:520px){
+  .pad{padding:20px 14px 18px 28px}
+  .pad:before{left:14px}
+  .pad-row{grid-template-columns:12px 1fr 78px 22px}
+  .pad-goal,.pad-head{grid-template-columns:12px 1fr 72px 72px 22px}
+  .pad-head span{font-size:8px;letter-spacing:.06em}
+}
+
+/* ============ WALLET REAL ============ */
+.wallet{position:relative;overflow:hidden;border-color:color-mix(in srgb,var(--jade) 30%,var(--line))}
+.wallet:before{content:"";position:absolute;right:-70px;top:-70px;width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(circle,color-mix(in srgb,var(--jade) 15%,transparent),transparent 65%);pointer-events:none}
+.wallet .wnum{font-family:var(--mono);font-size:38px;font-weight:800;letter-spacing:-.045em;line-height:1;
+  color:var(--jade);font-variant-numeric:tabular-nums;margin:8px 0 6px;position:relative}
+@media(max-width:480px){.wallet .wnum{font-size:31px}}
+.wallet .wsub{font-size:13px;color:var(--muted);position:relative;line-height:1.5}
+.wallet .wsub b{color:var(--paper)}
+.spark{display:flex;align-items:flex-end;gap:5px;height:66px;margin-top:16px}
+.spark .sb{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%;min-width:0}
+.spark .sb i{display:block;width:100%;background:color-mix(in srgb,var(--jade) 32%,transparent);border-radius:4px 4px 2px 2px;
+  transition:height 1s cubic-bezier(.22,.9,.25,1);min-height:3px}
+.spark .sb.now i{background:var(--jade)}
+.spark-lab{display:flex;gap:5px;margin-top:6px}
+.spark-lab span{flex:1;text-align:center;font:600 9px/1 var(--mono);color:var(--faint);min-width:0;overflow:hidden}
+
+/* ============ STRISCIA NUMERI CHIAVE ============ */
+.strip{display:flex;align-items:stretch;margin-top:20px;border-top:1px solid var(--line-soft);padding-top:16px;position:relative}
+.strip>div{flex:1;text-align:center;padding:0 6px;position:relative}
+.strip>div+div:before{content:"";position:absolute;left:0;top:12%;bottom:12%;width:1px;background:var(--line-soft)}
+.strip b{display:block;font-family:var(--mono);font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.strip small{display:block;font:700 8.5px/1.3 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-top:4px}
+@media(max-width:470px){.strip b{font-size:12.5px}.strip small{font-size:7px;letter-spacing:.05em}.strip>div{padding:0 3px}}
+
+/* ============ SEMAFORO DI STATO ============ */
+.status{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:99px;
+  font:700 11.5px/1 var(--sans);border:1px solid;margin-bottom:2px}
+.status i{width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+.status.ok{color:var(--jade);border-color:color-mix(in srgb,var(--jade) 34%,transparent);background:color-mix(in srgb,var(--jade) 10%,transparent)}
+.status.occhio{color:var(--amber);border-color:color-mix(in srgb,var(--amber) 38%,transparent);background:var(--amber-dim)}
+.status.attenzione{color:var(--rust);border-color:color-mix(in srgb,var(--rust) 34%,transparent);background:color-mix(in srgb,var(--rust) 10%,transparent)}
+
+/* ============ LE TRE FAMIGLIE ============ */
+.fam{margin-top:4px}
+.fam-bar{display:flex;height:34px;border-radius:10px;overflow:hidden;border:1px solid var(--line-soft);background:var(--inset)}
+.fam-bar i{display:block;background:var(--fc);transition:width 1s cubic-bezier(.22,.9,.25,1);position:relative}
+.fam-bar i+i{border-left:1px solid color-mix(in srgb,var(--void) 45%,transparent)}
+.fam-leg{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;margin-top:14px}
+.fam-leg>div{border-left:3px solid var(--fc);padding-left:10px}
+.fam-leg b{display:block;font-size:12.5px;font-weight:750}
+.fam-leg .fv{font-family:var(--mono);font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:2px}
+.fam-leg small{display:block;font-size:10.5px;color:var(--faint);margin-top:2px;line-height:1.35}
+
+/* ============ REVISIONE SETTIMANALE ============ */
+.review{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);overflow:hidden;box-shadow:var(--shadow)}
+.review-top{padding:16px 18px 14px;background:linear-gradient(160deg,color-mix(in srgb,var(--sky) 12%,transparent),transparent 75%);
+  border-bottom:1px dashed var(--line)}
+.review-top .eyebrow{margin-bottom:7px}
+.review-top h3{margin:0;font-size:17px;letter-spacing:-.02em}
+.review-body{padding:14px 18px 16px}
+.review-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;font-size:13px;border-bottom:1px solid var(--line-soft)}
+.review-row:last-of-type{border-bottom:0}
+.review-row .rv{font-family:var(--mono);font-weight:700;font-variant-numeric:tabular-nums}
+.review-end{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.review-end .rmsg{flex:1;min-width:170px;font-size:13px;font-weight:700}
+
+/* ============ RISPARMIO 72H ============ */
+.saved{display:flex;align-items:center;gap:12px;background:color-mix(in srgb,var(--jade) 9%,transparent);
+  border:1px solid color-mix(in srgb,var(--jade) 28%,transparent);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:14px}
+.saved b{font-family:var(--mono);font-size:19px;font-weight:800;color:var(--jade);letter-spacing:-.03em}
+.saved span{font-size:12px;color:var(--muted);line-height:1.4}
+
+/* ============ MISC ============ */
+.big-amt{background:var(--inset);border:1px solid var(--line);border-radius:14px;padding:14px 16px;
+  font-family:var(--mono);font-size:26px;font-weight:800;width:100%;text-align:center;letter-spacing:-.03em}
+.big-amt:focus{outline:none;border-color:var(--amber);background:var(--panel)}
+.seg-btns{display:flex;gap:6px;background:var(--inset);padding:4px;border-radius:11px;border:1px solid var(--line)}
+.seg-btns button{flex:1;padding:8px 6px;border-radius:8px;font-size:12px;font-weight:700;color:var(--muted);transition:.15s}
+.seg-btns button.on{background:var(--panel);color:var(--paper);box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.stat-line{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line-soft);font-size:13px}
+.stat-line:last-child{border-bottom:0}
+.stat-line .sv{font-family:var(--mono);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* ============ SINCRONIZZAZIONE ============ */
+#syncPill svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#syncPill.girando svg{animation:spin 1.1s linear infinite}
+</style>
+</head>
+<body>
+<div class="loadscreen" id="loadScreen">
+  <div class="mark"><i>€</i></div>
+  <div class="txt">Un attimo</div>
+</div>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <div class="eyebrow"><span class="pulse"></span><span id="hdrDay">—</span></div>
+      <h1 id="hdrTitle">Soldi</h1>
+    </div>
+    <div class="top-right">
+      <span class="saveflag" id="saveFlag">salvato</span>
+      <button class="icon-btn" id="syncPill" data-act="sync-ora" title="Sincronizzazione"></button>
+      <button class="icon-btn" id="saveBtn" title="Salva ora">
+        <svg class="ic" style="margin:0;width:15px;height:15px" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+      </button>
+      <button class="icon-btn" id="themeBtn" title="Cambia tema">◐</button>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+
+<!-- ======================= OGGI ======================= -->
+<section class="view on" id="v-oggi">
+  <div class="stack">
+
+    <div class="card today" id="todayCard">
+      <div id="statusSlot" style="position:relative"></div>
+      <div class="lab">Oggi puoi spendere</div>
+      <div class="big" id="todayBig">—</div>
+      <div class="sub" id="todaySub">—</div>
+      <div class="pace">
+        <div class="pace-track"><i id="paceFill"></i><span class="pace-mark" id="paceMark"></span></div>
+        <div class="pace-legend"><span id="paceL">—</span><span id="paceR">—</span></div>
+      </div>
+      <div class="strip" id="strip"></div>
+    </div>
+
+    <div id="revSlot"></div>
+    <div id="nudgeSlot"></div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="eyebrow"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Segna una spesa</span>
+        <div class="right"><span class="tiny muted num" id="todaySpent"></span></div>
+      </div>
+      <div class="presets" id="presets"></div>
+      <hr class="sep">
+      <input class="big-amt mono" id="qAmt" type="number" step="0.01" min="0" inputmode="decimal" placeholder="0,00">
+      <div class="addrow" style="margin-top:9px">
+        <input class="inp" id="qLabel" placeholder="Cosa (facoltativo)">
+        <select class="inp" id="qCat" style="width:150px"></select>
+        <button class="btn solid" data-act="quick-add">Segna</button>
+      </div>
+      <div id="todayList" style="margin-top:6px"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="eyebrow"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Le voglie · regola delle 72 ore</span>
+        <div class="right"><span class="tiny muted" id="wishCount"></span></div>
+      </div>
+      <div id="savedBox"></div>
+      <div id="wishList"></div>
+      <div class="addrow">
+        <input class="inp" id="wLabel" placeholder="Cosa vorresti comprare">
+        <input class="inp mono" id="wVal" type="number" step="0.01" placeholder="0" style="width:100px">
+        <button class="btn" data-act="add-wish">+</button>
+      </div>
+      <div class="note" style="margin-top:12px">Se costa più di qualche euro, mettilo qui invece di comprarlo. Dopo tre giorni decidi a mente fredda: quasi sempre la voglia è passata da sola.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ======================= MESE ======================= -->
+<section class="view" id="v-mese">
+  <div class="stack">
+    <div class="card">
+      <div class="card-head">
+        <span class="eyebrow"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Il mese</span>
+        <div class="right">
+          <div class="mpick">
+            <button class="mnav" data-act="m-prev">‹</button>
+            <b id="mLabel">—</b>
+            <button class="mnav" data-act="m-next">›</button>
+          </div>
+        </div>
+      </div>
+      <div class="fam" id="fam"></div>
+      <hr class="sep">
+      <div class="flow" id="flow"></div>
+      <div id="flowNote"></div>
+      <div id="closeSlot"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="eyebrow"><svg class="ic" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8.5 12.5l2.3 2.3L16 9.5"/></svg>Spese fisse</span>
+        <div class="right"><span class="tiny muted num" id="fxDone">—</span></div>
+      </div>
+      <div id="fxList"></div>
+      <div class="note" style="margin-top:12px">Spunta quando l'addebito è passato davvero. Serve solo a non trovarti sorprese: non è un compito.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="eyebrow"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7L5.8 21l1.6-7L2 9.3l7.1-.7z"/></svg>Sfizi · dove vanno</span>
+        <div class="right"><span class="tiny muted num" id="sfTot">—</span></div>
+      </div>
+      <div id="catList"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="eyebrow"><svg class="ic" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>Movimenti</span>
+        <div class="right"><span class="tiny muted num" id="movCount"></span></div>
+      </div>
+      <div id="movList"></div>
+      <div class="addrow">
+        <input class="inp mono" id="nAmt" type="number" step="0.01" placeholder="0,00" style="width:96px">
+        <input class="inp mono" id="nDate" type="date" style="width:145px">
+        <input class="inp" id="nLabel" placeholder="Descrizione">
+        <select class="inp" id="nCat" style="width:145px"></select>
+        <button class="btn solid" data-act="add-mov">+</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= PATRIMONIO ======================= -->
+<section class="view" id="v-patrimonio">
+  <div class="stack">
+
+    <div class="card today" style="--tc:var(--amber)">
+      <div class="lab">Patrimonio</div>
+      <div class="big" id="patBig">—</div>
+      <div class="sub" id="patSub">—</div>
+    </div>
+
+    <div class="card wallet">
+      <div class="card-head">
+        <span class="eyebrow"><svg class="ic" viewBox="0 0 24 24"><path d="M3 7h18v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 7l3-4h12l3 4M16 13h3"/></svg>Wallet Real</span>
+        <div class="right"><span class="eyebrow" id="wrMesi">—</span></div>
+      </div>
+      <div class="wnum" id="wrNum">—</div>
+      <div class="wsub" id="wrSub">—</div>
+      <div id="wrSpark"></div>
+      <div class="row-actions">
+        <button class="btn sm" data-act="wallet-goal">Destinalo a un obiettivo</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="eyebrow"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>I tuoi obiettivi</span>
+        <div class="right"><button class="btn sm" data-act="add-goal">+ Obiettivo</button></div>
+      </div>
+      <div id="goalList"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="eyebrow"><svg class="ic" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20M6 15h4"/></svg>Dove stanno i soldi</span>
+        <div class="right"><span class="tiny muted num" id="acctTot">—</span></div>
+      </div>
+      <div id="acctList"></div>
+      <div class="addrow">
+        <input class="inp" id="newAcct" placeholder="Nuovo conto">
+        <input class="inp mono" id="newAcctV" type="number" step="0.01" placeholder="0" style="width:104px">
+        <button class="btn" data-act="add-acct">+</button>
+      </div>
+      <div class="row-actions"><button class="btn sm" data-act="preleva">Registra un prelievo</button></div>
+      <div class="note" style="margin-top:14px">Aggiorna questi numeri quando controlli l'app della banca. È l'unico dato che devi inserire a mano: tutto il resto si calcola da solo, quindi i conti non possono mai sballare.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ======================= ANDAMENTO ======================= -->
+<section class="view" id="v-andamento">
+  <div class="stack">
+    <div class="card">
+      <div class="card-head">
+        <span class="eyebrow"><svg class="ic" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-9"/><path d="M15 6h6v6"/></svg>Patrimonio nel tempo</span>
+        <div class="right"><span class="eyebrow" id="patTrend">—</span></div>
+      </div>
+      <div class="chart-wrap" id="patChart"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="eyebrow"><svg class="ic" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Entrate contro uscite</span></div>
+      <div class="chart-wrap" id="ioChart"></div>
+      <div class="legend" style="margin-top:12px">
+        <span class="chip" style="--sc:var(--jade)"><i></i>Entrate</span>
+        <span class="chip" style="--sc:var(--rust)"><i></i>Uscite</span>
+        <span class="chip" style="--sc:var(--amber)"><i></i>Avanzo</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="eyebrow"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6 3"/></svg>I numeri che contano</span></div>
+      <div id="healthList"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="eyebrow"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2l7 4v6c0 5-3 8-7 10-4-2-7-5-7-10V6z"/></svg>Se non cambia niente</span></div>
+      <div id="projection"></div>
+      <div class="row-actions">
+        <button class="btn sm" data-act="report"><svg class="ic" style="margin-right:5px" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>Genera report</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= PIANO ======================= -->
+<section class="view" id="v-piano">
+  <div class="stack">
+    <div class="pad">
+      <div class="pad-h">Gestione spese</div>
+      <div class="pad-date">
+        <div class="cal"><span class="cal-top"></span><b id="padDay">–</b></div>
+        <div class="pad-date-txt">
+          <b id="padDow">—</b>
+          <span id="padMy">—</span>
+          <i id="padLive">aggiornato a oggi</i>
+        </div>
+      </div>
+
+      <div class="pad-s">
+        <h3>Entrate</h3>
+        <div id="padEntrate"></div>
+      </div>
+
+      <div class="pad-s">
+        <h3>Spese fisse</h3>
+        <div id="padFisse"></div>
+        <div class="pad-totline"><div class="pad-tot"><small>Tot</small><span id="padFisseTot">—</span></div></div>
+        <div class="pad-add">
+          <input class="inp" id="padNewFx" placeholder="Nuova voce">
+          <input class="inp mono" id="padNewFxV" type="number" step="0.01" placeholder="0" style="width:92px">
+          <button class="btn solid" data-act="pad-add-fx">+</button>
+        </div>
+      </div>
+
+      <div class="pad-s">
+        <h3>Sfizi</h3>
+        <div id="padSfizi"></div>
+        <div class="pad-totline"><div class="pad-tot"><small>Tot</small><span id="padSfiziTot">—</span></div></div>
+        <div class="pad-add">
+          <input class="inp" id="padNewSf" placeholder="Nuova voce">
+          <input class="inp mono" id="padNewSfV" type="number" step="0.01" placeholder="0" style="width:92px">
+          <button class="btn solid" data-act="pad-add-sf">+</button>
+        </div>
+      </div>
+
+      <div class="pad-s">
+        <h3>Obiettivi</h3>
+        <div id="padGoals"></div>
+        <div class="pad-totline" style="gap:8px">
+          <div class="pad-tot"><small>Dedicato</small><span id="padGoalDed">—</span></div>
+          <div class="pad-tot"><small>Al mese</small><span id="padGoalTot">—</span></div>
+        </div>
+      </div>
+
+      <div class="pad-s">
+        <h3>Il conto</h3>
+        <div class="pad-calc" id="padCalc"></div>
+      </div>
+
+      <div class="pad-s">
+        <h3>Dove arrivi</h3>
+        <div class="pad-calc" id="padProj"></div>
+      </div>
+    </div>
+
+    <div class="note">Questa pagina è il tuo quaderno: tutti i budget che ti sei imposto, in un posto solo. Le cifre che hai <b>adesso</b> sui conti stanno in <b>Obiettivi</b>, così il piano resta pulito e non si mescola con la realtà del momento.</div>
+  </div>
+</section>
+
+<!-- ======================= SETUP ======================= -->
+<section class="view" id="v-setup">
+  <div class="stack">
+    <div class="card">
+      <div class="card-head"><span class="eyebrow"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M9 12h11M4 18h13M19 18h1"/><circle cx="12" cy="6" r="2"/><circle cx="6" cy="12" r="2"/><circle cx="16" cy="18" r="2"/></svg>Budget e spese</span></div>
+      <div class="note">Entrate, spese fisse, sfizi e versamenti agli obiettivi si modificano tutti nella pagina <b>Piano</b>: è il tuo quaderno, con tutte le voci una sotto l'altra.</div>
+      <div class="row-actions"><button class="btn solid sm" data-act="go" data-view="piano">Apri il Piano</button></div>
+      <div id="paramNote"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="eyebrow"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Pulsanti rapidi</span>
+      </div>
+      <div class="erow env" style="border:0;padding-bottom:2px;grid-template-columns:1fr 90px 1fr 30px"><span class="eyebrow">Nome</span><span class="eyebrow">Euro</span><span class="eyebrow">Categoria</span><span></span></div>
+      <div id="preRows"></div>
+      <div class="addrow">
+        <input class="inp" id="newPre" placeholder="Es. Caffè">
+        <input class="inp mono" id="newPreV" type="number" step="0.01" placeholder="1,20" style="width:90px">
+        <select class="inp" id="newPreC" style="width:150px"></select>
+        <button class="btn solid" data-act="add-pre">+</button>
+      </div>
+      <div class="note" style="margin-top:12px">Sono i bottoni della schermata Oggi: un tocco e la spesa è segnata. Mettici le cose che ripeti sempre uguali.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="eyebrow"><svg class="ic" viewBox="0 0 24 24"><path d="M18 10h-1.3A6 6 0 1 0 6 15h12a3.5 3.5 0 0 0 0-7z"/></svg>Sincronizzazione fra dispositivi</span></div>
+      <div id="syncSlot"></div>
+    </div>
+
+<div class="card">
+      <div class="card-head"><span class="eyebrow"><svg class="ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>Dati</span></div>
+      <div class="row-actions" style="margin-top:0">
+        <button class="btn solid" data-act="report">Report PDF</button>
+        <button class="btn" data-act="export">Backup</button>
+        <button class="btn" data-act="import">Importa</button>
+        <button class="btn" data-act="csv">CSV movimenti</button>
+        <button class="btn warn" data-act="reset">Da zero</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="eyebrow"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7L5.8 21l1.6-7L2 9.3l7.1-.7z"/></svg>Come funziona</span></div>
+      <div class="note" id="method"></div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<div class="report" id="reportPrint"></div>
+
+<nav class="tabbar">
+  <div class="tabbar-in">
+    <button class="tab on" data-act="go" data-view="oggi"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Oggi</button>
+    <button class="tab" data-act="go" data-view="mese"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Mese</button>
+    <button class="tab" data-act="go" data-view="patrimonio"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>Obiettivi</button>
+    <button class="tab" data-act="go" data-view="andamento"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-9"/><path d="M15 6h6v6"/></svg>Grafici</button>
+    <button class="tab" data-act="go" data-view="piano"><svg viewBox="0 0 24 24"><path d="M4 4h13l3 3v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><path d="M7 9h9M7 13h9M7 17h5"/></svg>Piano</button>
+    <button class="tab" data-act="go" data-view="setup"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 7.3 19.4l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 3 15H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 8.7l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 10 4.6V3a2 2 0 1 1 4 0v.1A1.6 1.6 0 0 0 16.7 4.6l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0 1.1 2.7H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>Setup</button>
+  </div>
+</nav>
+
+<input type="file" id="fileIn" accept="application/json" hidden>
+<script>
+"use strict";
+
+/* ============================================================
+   SOLDI — versione 2
+   Regola di fondo: l'unica cosa che inserisci a mano è quanto c'è
+   sui conti. Tutto il resto si calcola, quindi i conti non possono
+   sballare. Il "libero" è sempre patrimonio meno obiettivi.
+   ============================================================ */
+
+const MESI = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+const MESI_BR = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+const PALETTE = ['--jade','--sky','--k-libero','--k-focus','--k-casa','--amber','--violet','--k-pasto'];
+
+const DEF = {
+  v: 2,
+  theme: 'dark',
+  param: { entrateMin: 1450, entrateTip: 1500, entrateMax: 1550, sfiziBudget: 200 },
+
+  /* Dove stanno i soldi. Questo lo aggiorni tu quando guardi la banca. */
+  conti: [
+    { id: 'a1', l: 'Carta di credito', v: 10180, tipo: 'carta' },
+    { id: 'a2', l: 'Portafoglio', v: 50, tipo: 'contanti' }
+  ],
+
+  /* Obiettivi: quanto c'è (v), quanto serve (t), quanto ci metti ogni mese (r),
+     entro quando (m), e se restano patrimonio o verranno spesi (cap). */
+  obiettivi: [
+    { id: 'g1', l: 'Fondo emergenza', v: 6000, t: 6000, r: 0,     m: '', cap: 1 },
+    { id: 'g2', l: 'Imprevisti vari', v: 2000, t: 2000, r: 0,     m: '', cap: 1 },
+    { id: 'g3', l: 'Investimenti',    v: 100,  t: 0,    r: 100,   m: '', cap: 1 },
+    { id: 'g4', l: 'Vacanza',         v: 1000, t: 1000, r: 83.33, m: '2027-07', cap: 0 },
+    { id: 'g5', l: 'Vestiti',         v: 300,  t: 300,  r: 25,    m: '', cap: 0 },
+    { id: 'g6', l: 'Auto: bollo, assicurazione, tagliando', v: 0, t: 1200, r: 100, m: '', cap: 0 }
+  ],
+
+  /* Solo i soldi che escono davvero ogni mese */
+  fisse: [
+    { id: 'f1', l: 'Affitto', v: 420, n: '' },
+    { id: 'f2', l: 'Bollette', v: 190, n: 'acqua 15 · gas 60 · luce 40 · rifiuti 10' },
+    { id: 'f3', l: 'Spesa alimentare', v: 150, n: '' },
+    { id: 'f4', l: 'Diesel', v: 116, n: '55 litri × 2,10' },
+    { id: 'f5', l: '2 SIM', v: 24, n: '' }
+  ],
+
+  sfizi: [
+    { id: 's1', l: 'Ballare', v: 40, n: '2-4 volte' },
+    { id: 's2', l: 'Mangiare fuori', v: 60, n: '4 volte' },
+    { id: 's3', l: 'Colazione al bar', v: 30, n: '3 a settimana' },
+    { id: 's4', l: 'Caffè al lavoro', v: 15, n: '37 caffè' },
+    { id: 's5', l: 'Capelli', v: 18, n: '1 volta' },
+    { id: 's6', l: 'Palestra', v: 35, n: 'abbonamento' },
+    { id: 's7', l: 'Varie', v: 2, n: 'il resto' }
+  ],
+
+  preset: [
+    { id: 'p1', l: 'Caffè', v: 1.20, c: 'Caffè al lavoro' },
+    { id: 'p2', l: 'Colazione', v: 2.50, c: 'Colazione al bar' },
+    { id: 'p3', l: 'Pizza', v: 15, c: 'Mangiare fuori' },
+    { id: 'p4', l: 'Serata', v: 20, c: 'Ballare' }
+  ],
+
+  voglie: [],
+  mesi: {},
+  mov: {},
+  zero: [],  /* giorni confermati "non ho speso niente" */
+  start: '', /* primo giorno di utilizzo: prima di questo non chiedo niente */
+  evitato: 0,      /* euro non spesi grazie alla regola delle 72 ore */
+  ultimaRev: ''    /* ultima revisione settimanale */
+};
+
+const METODO = [
+  '<b>Un numero al giorno.</b> In alto c\'è quanto puoi spendere oggi in sfizi. Se lo rispetti, il mese si chiude da solo. Non devi guardare altro.',
+  '<b>Sforare non è un fallimento.</b> Se spendi di più, il numero scende e poi risale da solo nei giorni seguenti. Nessuno ti toglie punti.',
+  '<b>Segna quando paghi.</b> Tre secondi. I pulsanti rapidi servono a questo: un tocco e hai finito.',
+  '<b>Le voglie aspettano tre giorni.</b> Quello che vuoi comprare d\'impulso lo scrivi e lo lasci lì. Dopo 72 ore decidi da sveglio.',
+  '<b>Gli obiettivi si riempiono da soli.</b> Ogni mese ci metti una cifra fissa. Quando chiudi il mese, l\'app li aggiorna.',
+  '<b>Guardalo una volta al giorno.</b> Trenta secondi la sera. Di più non serve, e diventa solo ansia.'
+].join('<br><br>');
+
+/* ================= UTILI ================= */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const clone = o => JSON.parse(JSON.stringify(o));
+const uid = p => (p || 'x') + Math.random().toString(36).slice(2, 8);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+const n2 = v => Math.round((+v || 0) * 100) / 100;
+
+function eur(v, dec) {
+  const x = +v || 0;
+  const d = dec === undefined ? (Math.abs(x % 1) > 0.004 ? 2 : 0) : dec;
+  return x.toLocaleString('it-IT', { minimumFractionDigits: d, maximumFractionDigits: d }) + ' €';
+}
+const eurS = v => { const x = +v || 0; return (x > 0 ? '+' : x < 0 ? '−' : '') + eur(Math.abs(x)); };
+
+const dkey = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const mkey = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+const parseD = k => { const p = k.split('-'); return new Date(+p[0], +p[1] - 1, +(p[2] || 1)); };
+const addM = (k, n) => { const d = parseD(k + '-01'); d.setMonth(d.getMonth() + n); return mkey(d); };
+const mLabel = k => { const d = parseD(k + '-01'); return MESI[d.getMonth()] + ' ' + d.getFullYear(); };
+const mShort = k => { const d = parseD(k + '-01'); return MESI_BR[d.getMonth()] + ' ' + String(d.getFullYear()).slice(2); };
+const today = () => dkey(new Date());
+const thisMonth = () => mkey(new Date());
+const giorniMese = k => { const d = parseD(k + '-01'); return new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate(); };
+const mesiTra = (a, b) => { const x = parseD(a + '-01'), y = parseD(b + '-01'); return (y.getFullYear() - x.getFullYear()) * 12 + (y.getMonth() - x.getMonth()); };
+
+/* ================= SALVATAGGIO ================= */
+const KEY = 'soldi.v2';
+const Store = {
+  async get() {
+    if (window.storage) { try { const r = await window.storage.get(KEY); if (r && r.value) return JSON.parse(r.value); } catch (e) {} }
+    try { const raw = localStorage.getItem(KEY); if (raw) return JSON.parse(raw); } catch (e) {}
+    return null;
+  },
+  async set(v) {
+    const s = JSON.stringify(v);
+    try { localStorage.setItem(KEY, s); } catch (e) {}
+    if (window.storage) { try { await window.storage.set(KEY, s); } catch (e) {} }
+  }
+};
+let S = null, saveT = null;
+function saveSoon() {
+  clearTimeout(saveT);
+  if (S) S.updatedAt = Date.now();
+  if (window.SYNC) window.SYNC.push();
+  saveT = setTimeout(() => {
+    Store.set(S);
+    const f = $('#saveFlag'); if (f) { f.classList.add('on'); setTimeout(() => f.classList.remove('on'), 1100); }
+  }, 350);
+}
+function saveNow() { clearTimeout(saveT); Store.set(S); }
+window.addEventListener('beforeunload', () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} });
+document.addEventListener('visibilitychange', () => { if (document.hidden) saveNow(); });
+
+/* ================= NORMALIZZAZIONE ================= */
+function normalize(s) {
+  const d = clone(DEF);
+  s = (s && typeof s === 'object') ? s : {};
+  if (s.v === 1) s = migraV1(s);
+  const o = Object.assign({}, d, s);
+  o.param = Object.assign({}, d.param, s.param || {});
+  Object.keys(d.param).forEach(k => o.param[k] = n2(o.param[k]));
+
+  const list = (a, def, f) => (Array.isArray(a) && a.length ? a : def).map(x =>
+    Object.assign({ id: x.id || uid('i'), l: String(x.l || 'Voce'), v: n2(x.v) }, f ? f(x) : {}));
+
+  o.conti = list(s.conti, d.conti, x => ({ tipo: x.tipo || 'carta' }));
+  o.obiettivi = list(s.obiettivi, d.obiettivi, x => ({
+    t: n2(x.t), r: n2(x.r), m: /^\d{4}-\d{2}$/.test(x.m) ? x.m : '', cap: x.cap ? 1 : 0
+  }));
+  const notaDi = (arr, id) => { const x = arr.find(y => y.id === id); return x ? (x.n || '') : ''; };
+  o.fisse = list(s.fisse, d.fisse, x => ({ n: x.n != null ? String(x.n) : notaDi(d.fisse, x.id) }));
+  o.sfizi = list(s.sfizi, d.sfizi, x => ({ n: x.n != null ? String(x.n) : notaDi(d.sfizi, x.id) }));
+  o.preset = (Array.isArray(s.preset) ? s.preset : d.preset).map(x => ({
+    id: x.id || uid('p'), l: String(x.l || ''), v: n2(x.v), c: String(x.c || '')
+  }));
+  o.voglie = (Array.isArray(s.voglie) ? s.voglie : []).map(x => ({
+    id: x.id || uid('w'), l: String(x.l || ''), v: n2(x.v), d: x.d || new Date().toISOString()
+  }));
+  o.mesi = (s.mesi && typeof s.mesi === 'object') ? s.mesi : {};
+  Object.keys(o.mesi).forEach(k => {
+    const m = o.mesi[k] || {};
+    o.mesi[k] = { entrate: n2(m.entrate), pagate: Array.isArray(m.pagate) ? m.pagate : [],
+      patrimonio: m.patrimonio == null ? null : n2(m.patrimonio),
+      wallet: m.wallet == null ? null : n2(m.wallet), chiuso: !!m.chiuso };
+  });
+  o.mov = (s.mov && typeof s.mov === 'object') ? s.mov : {};
+  Object.keys(o.mov).forEach(k => {
+    o.mov[k] = (Array.isArray(o.mov[k]) ? o.mov[k] : []).map(x => ({
+      id: x.id || uid('m'), d: x.d || (k + '-01'), l: String(x.l || ''), v: n2(x.v),
+      cat: String(x.cat || 'Varie'),
+      tipo: ['sfizio','fissa','extra','entrata','obiettivo'].includes(x.tipo) ? x.tipo : 'sfizio',
+      gid: x.gid || ''
+    }));
+  });
+  o.zero = Array.isArray(s.zero) ? s.zero.filter(x => /^\d{4}-\d{2}-\d{2}$/.test(x)) : [];
+  o.start = /^\d{4}-\d{2}-\d{2}$/.test(s.start) ? s.start : today();
+  o.evitato = n2(s.evitato);
+  o.ultimaRev = /^\d{4}-\d{2}-\d{2}$/.test(s.ultimaRev) ? s.ultimaRev : '';
+  o.theme = s.theme === 'light' ? 'light' : 'dark';
+  o.updatedAt = +s.updatedAt || 0;
+  o.v = 2;
+  return o;
+}
+
+/* Recupero dalla versione precedente senza perdere niente */
+function migraV1(s) {
+  const o = { v: 2, theme: s.theme, mov: s.mov, mesi: {}, zero: [] };
+  o.param = { entrateMin: (s.param || {}).entrateMin, entrateTip: (s.param || {}).entrateTip,
+    entrateMax: (s.param || {}).entrateMax, sfiziBudget: (s.param || {}).sfiziBudget };
+  o.conti = (s.contenitori || []).map(c => ({ id: c.id, l: c.l, v: c.v, tipo: /portafogl|contant/i.test(c.l) ? 'contanti' : 'carta' }));
+  o.obiettivi = (s.buste || []).filter(b => !/sfiz|risparmi extra/i.test(b.l))
+    .map(b => ({ id: b.id, l: b.l, v: b.v, t: b.t, r: 0, m: '', cap: /emerg|imprev|investiment/i.test(b.l) ? 1 : 0 }));
+  o.fisse = (s.fisse || []).filter(f => !/^auto:/i.test(f.l));
+  o.sfizi = s.sfizi; o.preset = DEF.preset; o.voglie = [];
+  Object.keys(s.mesi || {}).forEach(k => {
+    const m = s.mesi[k];
+    o.mesi[k] = { entrate: m.entrate, pagate: m.pagate, patrimonio: m.patrimonio, chiuso: m.chiuso };
+  });
+  return o;
+}
+
+function M(k) {
+  k = k || thisMonth();
+  if (!S.mesi[k]) S.mesi[k] = { entrate: S.param.entrateTip, pagate: [], patrimonio: null, wallet: null, chiuso: false };
+  return S.mesi[k];
+}
+function MOV(k) { k = k || thisMonth(); if (!S.mov[k]) S.mov[k] = []; return S.mov[k]; }
+
+/* ================= I CONTI ================= */
+const patrimonio = () => n2(S.conti.reduce((a, c) => a + c.v, 0));
+const impegnato = () => n2(S.obiettivi.reduce((a, g) => a + g.v, 0));
+/* Sempre coerente per costruzione: non serve nessuna "quadratura". */
+const libero = () => n2(patrimonio() - impegnato());
+
+/* Il Wallet Real: quello che hai davvero costruito.
+   Sono i soldi liberi MENO gli sfizi ancora da spendere questo mese,
+   perch\u00e9 quelli sono gi\u00e0 destinati al divertimento di agosto, non sono accumulo. */
+function walletReal() { return n2(libero() - Math.max(0, sfiziRimasti(thisMonth()))); }
+
+/* Come \u00e8 cresciuto mese per mese, dai mesi che hai chiuso */
+function storicoWallet() {
+  const out = mesiStorici(12).map(k => ({
+    k, v: k === thisMonth() ? walletReal() : (S.mesi[k] && S.mesi[k].wallet != null ? S.mesi[k].wallet : null)
+  })).filter(x => x.v != null);
+  return out;
+}
+
+const fisseTot = () => n2(S.fisse.reduce((a, f) => a + f.v, 0));
+/* Quanto costano gli obiettivi ogni mese: è il ritmo di spesa annuo, va sempre riservato. */
+const accantonaTot = () => n2(S.obiettivi.reduce((a, g) => a + g.r, 0));
+/* Quanto si versa davvero alla chiusura: gli obiettivi già pieni saltano il turno. */
+const accantonaAttivo = () => n2(S.obiettivi.reduce((a, g) => a + ((g.t > 0 && g.v >= g.t) ? 0 : g.r), 0));
+const costoVita = () => n2(fisseTot() + S.param.sfiziBudget);
+
+const spesoTipo = (k, t) => n2(MOV(k).filter(x => x.tipo === t).reduce((a, x) => a + x.v, 0));
+const sfiziSpesi = k => spesoTipo(k, 'sfizio');
+const sfiziRimasti = k => n2(S.param.sfiziBudget - sfiziSpesi(k));
+
+/* Quanto puoi spendere oggi: quello che resta diviso i giorni che restano. */
+function oggiDisponibile() {
+  const k = thisMonth(), gg = giorniMese(k) - new Date().getDate() + 1;
+  const speso = MOV(k).filter(x => x.tipo === 'sfizio' && x.d === today()).reduce((a, x) => a + x.v, 0);
+  const base = (sfiziRimasti(k) + speso) / Math.max(1, gg);
+  return { quota: n2(Math.max(0, base)), oggi: n2(Math.max(0, base - speso)), speso: n2(speso), giorni: gg };
+}
+
+/* Sei in pari col ritmo del mese? */
+function ritmo() {
+  const k = thisMonth(), tot = giorniMese(k), pass = new Date().getDate();
+  const budget = S.param.sfiziBudget;
+  const atteso = n2(budget * pass / tot);
+  const reale = sfiziSpesi(k);
+  const diff = n2(atteso - reale);
+  const alGiorno = budget / tot;
+  const recupero = diff < 0 ? Math.ceil(Math.abs(diff) / Math.max(0.01, alGiorno)) : 0;
+  return { atteso, reale, diff, budget, pass, tot, recupero, pctReale: budget ? clamp(reale / budget * 100, 0, 100) : 0, pctAtteso: clamp(pass / tot * 100, 0, 100) };
+}
+
+/* Bilancio del mese */
+function bilancio(k) {
+  k = k || thisMonth();
+  const m = M(k);
+  const entrate = n2(m.entrate + spesoTipo(k, 'entrata'));
+  const fisse = fisseTot(), sfizi = S.param.sfiziBudget;
+  const acc = accantonaTot(), extra = spesoTipo(k, 'extra');
+  const daFondi = spesoTipo(k, 'obiettivo');   /* soldi già accantonati in passato */
+  const avanzo = n2(entrate - fisse - sfizi - acc - extra);
+  const capMens = n2(S.obiettivi.filter(g => g.cap).reduce((a, g) => a + g.r, 0));
+  const accumulo = n2(avanzo + capMens);
+  return { k, entrate, fisse, sfizi, acc, extra, daFondi, avanzo, capMens, accumulo,
+    tasso: entrate ? n2(accumulo / entrate * 100) : 0,
+    realeSfizi: sfiziSpesi(k), realeFisse: n2(S.fisse.filter(f => m.pagate.includes(f.id)).reduce((a, f) => a + f.v, 0)) };
+}
+
+/* Quando arrivo a un obiettivo */
+function eta(g) {
+  if (g.t <= 0) return null;
+  const manca = n2(g.t - g.v);
+  if (manca <= 0) return { fatto: true };
+  if (g.r <= 0) return { fatto: false, mai: true, manca };
+  const mesi = Math.ceil(manca / g.r);
+  const d = new Date(); d.setMonth(d.getMonth() + mesi);
+  return { fatto: false, mesi, manca, quando: mkey(d) };
+}
+
+/* Categorie disponibili */
+function categorie() {
+  return S.sfizi.map(x => ({ l: x.l, tipo: 'sfizio' }))
+    .concat([{ l: 'Spesa fissa', tipo: 'fissa' }, { l: 'Fuori budget', tipo: 'extra' }])
+    /* Spendere i soldi che avevi già messo da parte: esce dal conto E dall'obiettivo,
+       così i soldi liberi non si muovono di un centesimo. */
+    .concat(S.obiettivi.map(g => ({ l: 'Dal fondo: ' + g.l, tipo: 'obiettivo', gid: g.id })))
+    .concat([{ l: 'Entrata extra', tipo: 'entrata' }]);
+}
+function catInfo(c) {
+  const x = categorie().find(y => y.l === c);
+  return x || { l: c, tipo: 'sfizio', gid: '' };
+}
+
+const contCash = () => S.conti.find(c => c.tipo === 'contanti');
+const contMain = () => S.conti.find(c => c.tipo !== 'contanti') || S.conti[0];
+
+/* Giorni senza movimenti e non ancora confermati vuoti */
+function giorniScoperti() {
+  const k = thisMonth(), out = [], oggi = new Date();
+  const mv = MOV(k);
+  for (let i = 1; i < Math.min(6, oggi.getDate()); i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const key = dkey(d);
+    if (mkey(d) !== k) break;
+    if (S.start && key < S.start) break;
+    if (!mv.some(x => x.d === key) && S.zero.indexOf(key) < 0) out.push(key);
+  }
+  return out;
+}
+
+/* Un semaforo, non un voto: tre stati, ognuno con un motivo concreto. */
+function stato() {
+  const b = bilancio(thisMonth()), r = ritmo(), lib = libero();
+  if (lib < 0) return { s: 'attenzione', t: 'Da sistemare', w: 'Hai destinato pi\u00f9 soldi di quanti ne hai sui conti.' };
+  const vuoto = S.obiettivi.find(g => g.v < -0.01);
+  if (vuoto) return { s: 'occhio', t: 'Un fondo \u00e8 scoperto', w: 'Da "' + vuoto.l + '" hai preso pi\u00f9 di quello che c\u2019era: rimettilo in pari nei prossimi mesi.' };
+  if (b.avanzo < 0) return { s: 'attenzione', t: 'Da sistemare', w: 'Il piano del mese chiude in negativo: stai promettendo pi\u00f9 di quello che entra.' };
+  if (r.diff < -r.budget * 0.25) return { s: 'occhio', t: 'Occhio al ritmo', w: 'Stai spendendo pi\u00f9 in fretta del previsto, ma sei ancora in tempo.' };
+  return { s: 'ok', t: 'Sei sotto controllo', w: 'Niente da correggere. Non devi fare altro.' };
+}
+
+/* Revisione settimanale: una volta ogni sette giorni, non di pi\u00f9. */
+function revisione() {
+  const base = S.ultimaRev || S.start || today();
+  const gg = Math.floor((parseD(today()) - parseD(base)) / 86400000);
+  if (gg < 7) return null;
+  const k = thisMonth(), lim = new Date(); lim.setDate(lim.getDate() - 7);
+  const limK = dkey(lim);
+  let sfizi = 0, tutto = 0;
+  Object.keys(S.mov).forEach(mk => S.mov[mk].forEach(m => {
+    if (m.d > limK && m.tipo !== 'entrata') { tutto = n2(tutto + m.v); if (m.tipo === 'sfizio') sfizi = n2(sfizi + m.v); }
+  }));
+  const budgetSett = n2(S.param.sfiziBudget / giorniMese(k) * 7);
+  return { gg, sfizi, tutto, budgetSett, ok: sfizi <= budgetSett, pct: budgetSett ? Math.round(sfizi / budgetSett * 100) : 0 };
+}
+
+/* Mesi con dati */
+function mesiStorici(n) {
+  const set = new Set(Object.keys(S.mesi).concat(Object.keys(S.mov)));
+  set.add(thisMonth());
+  let a = Array.from(set).filter(k => /^\d{4}-\d{2}$/.test(k)).sort();
+  return n && a.length > n ? a.slice(-n) : a;
+}
+const patrimonioDi = k => k === thisMonth() ? patrimonio() : (S.mesi[k] && S.mesi[k].patrimonio != null ? S.mesi[k].patrimonio : null);
+
+/* ================= RENDER ================= */
+let VIEW = 'oggi', MSEL = null, animato = {};
+
+function renderAll() {
+  renderHeader();
+  ({ oggi: renderOggi, mese: renderMese, patrimonio: renderPatrimonio, andamento: renderAndamento,
+     piano: renderPiano, setup: renderSetup }[VIEW])();
+}
+function renderHeader() {
+  const d = new Date();
+  $('#hdrDay').textContent = d.getDate() + ' ' + MESI[d.getMonth()] + ' ' + d.getFullYear();
+  const h = d.getHours();
+  $('#hdrTitle').textContent = h < 12 ? 'Buongiorno' : h < 18 ? 'Buon pomeriggio' : 'Buonasera';
+}
+
+/* Numeri che salgono, una volta sola per schermata */
+function countTo(el, to, key) {
+  if (!el) return;
+  if (animato[key] === to) { el.textContent = eur(to); return; }
+  const from = animato[key] == null ? 0 : animato[key];
+  animato[key] = to;
+  el.textContent = eur(to);
+  if (!window.requestAnimationFrame) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const t0 = performance.now(), dur = 700;
+  (function step(t) {
+    const p = clamp((t - t0) / dur, 0, 1), e = 1 - Math.pow(1 - p, 3);
+    el.textContent = eur(from + (to - from) * e);
+    if (p < 1) requestAnimationFrame(step);
+  })(t0);
+}
+
+/* ---------------- OGGI ---------------- */
+function renderOggi() {
+  const k = thisMonth(), o = oggiDisponibile(), r = ritmo();
+  const col = o.oggi > 0 ? (r.diff >= 0 ? 'var(--jade)' : 'var(--amber)') : 'var(--rust)';
+  $('#todayCard').style.setProperty('--tc', col);
+  countTo($('#todayBig'), o.oggi, 'today');
+
+  $('#todaySub').innerHTML = o.oggi > 0
+    ? 'Restano <b>' + eur(sfiziRimasti(k)) + '</b> di sfizi su ' + eur(S.param.sfiziBudget) + ', in ' + o.giorni + ' giorni.'
+      + (o.speso > 0 ? ' Oggi hai già speso ' + eur(o.speso) + '.' : '')
+    : (sfiziRimasti(k) > 0
+      ? 'Per oggi il budget è finito. Domani riparti da <b>' + eur(o.quota) + '</b>.'
+      : 'Gli sfizi del mese sono esauriti. Non è una tragedia: mancano ' + o.giorni + ' giorni e poi si ricomincia.');
+
+  $('#paceFill').style.width = r.pctReale + '%';
+  $('#paceFill').style.setProperty('--pc', r.diff >= 0 ? 'var(--jade)' : 'var(--amber)');
+  $('#paceMark').style.left = r.pctAtteso + '%';
+  $('#paceL').textContent = 'speso ' + eur(r.reale);
+  $('#paceR').textContent = r.diff >= 0 ? 'sei sotto di ' + eur(r.diff) : 'sopra di ' + eur(Math.abs(r.diff));
+
+  /* La striscia: le altre domande a cui vuoi rispondere in cinque secondi,
+     piccole, sotto il numero grande, senza rubargli la scena. */
+  const b = bilancio(k), st = stato();
+  const wr = walletReal();
+  $('#strip').innerHTML =
+    '<div><b>' + eur(patrimonio(), 0) + '</b><small>Patrimonio</small></div>' +
+    '<div><b style="color:' + (wr >= 0 ? 'var(--jade)' : 'var(--rust)') + '">' + eur(wr, 0) + '</b><small>Wallet Real</small></div>' +
+    '<div><b>' + eur(sfiziRimasti(k), 0) + '</b><small>Sfizi rimasti</small></div>' +
+    '<div><b>' + eurS(b.accumulo) + '</b><small>Questo mese</small></div>';
+  $('#statusSlot').innerHTML = '<span class="status ' + st.s + '" title="' + esc(st.w) + '"><i></i>' + esc(st.t) + '</span>';
+
+  renderRevisione();
+  renderNudge();
+
+  /* preset e log */
+  $('#presets').innerHTML = S.preset.map(p =>
+    '<button class="pre" data-act="pre" data-id="' + p.id + '"><b>' + esc(p.l) + '</b><span>' + eur(p.v) + '</span></button>').join('') +
+    '<button class="pre add" data-act="go" data-view="setup" title="Aggiungi un pulsante">+</button>';
+
+  const cats = categorie();
+  const cur = $('#qCat').value;
+  $('#qCat').innerHTML = cats.map(c => '<option' + (c.l === cur ? ' selected' : '') + '>' + esc(c.l) + '</option>').join('');
+
+  const oggiMov = MOV(k).filter(x => x.d === today());
+  $('#todaySpent').textContent = oggiMov.length ? 'oggi ' + eur(oggiMov.filter(x => x.tipo !== 'entrata').reduce((a, x) => a + x.v, 0)) : '';
+  $('#todayList').innerHTML = oggiMov.length
+    ? '<hr class="sep">' + movRows(oggiMov.slice().reverse(), true)
+    : '';
+
+  /* voglie */
+  $('#savedBox').innerHTML = S.evitato > 0
+    ? '<div class="saved"><b>' + eur(S.evitato) + '</b><span>non spesi, perch\u00e9 dopo tre giorni la voglia era passata.<br>' +
+      'Sono ' + eur(n2(S.evitato)) + ' che stanno ancora sul tuo conto.</span></div>'
+    : '';
+  const now = Date.now();
+  $('#wishCount').textContent = S.voglie.length ? S.voglie.length + ' in attesa' : '';
+  $('#wishList').innerHTML = S.voglie.length ? S.voglie.map(w => {
+    const passate = (now - new Date(w.d).getTime()) / 3600000;
+    const p = clamp(passate / 72 * 100, 0, 100), pronto = passate >= 72;
+    const C = 100.5, off = C - C * p / 100;
+    return '<div class="wish ' + (pronto ? 'ready' : '') + '">' +
+      '<div class="wr"><svg viewBox="0 0 40 40"><circle class="t" cx="20" cy="20" r="16"/>' +
+      '<circle class="f" cx="20" cy="20" r="16" stroke-dasharray="' + C + '" stroke-dashoffset="' + off.toFixed(1) + '" style="stroke:' + (pronto ? 'var(--jade)' : 'var(--amber)') + '"/></svg>' +
+      '<b>' + (pronto ? '✓' : Math.max(0, Math.ceil(72 - passate)) + 'h') + '</b></div>' +
+      '<div class="wi"><b>' + esc(w.l) + '</b><span>' + eur(w.v) + ' · ' + (pronto ? 'puoi decidere' : 'aspetta ancora') + '</span></div>' +
+      (pronto ? '<button class="btn sm solid" data-act="wish-buy" data-id="' + w.id + '">Compro</button>' : '') +
+      '<button class="del" data-act="wish-del" data-id="' + w.id + '">×</button></div>';
+  }).join('') : '<div class="empty"><b>Nessuna voglia in attesa</b>Quando ti viene l\'impulso di comprare qualcosa, scrivilo qui.</div>';
+}
+
+/* Una volta a settimana, non di pi\u00f9. Chiude e ti lascia in pace. */
+function renderRevisione() {
+  const r = revisione();
+  if (!r) { $('#revSlot').innerHTML = ''; return; }
+  const b = bilancio(thisMonth());
+  $('#revSlot').innerHTML = '<div class="review"><div class="review-top">' +
+    '<div class="eyebrow">Controllo della settimana</div><h3>Sette giorni, in breve</h3></div>' +
+    '<div class="review-body">' +
+      '<div class="review-row"><span>Sfizi spesi</span><span class="rv">' + eur(r.sfizi) + ' <span class="muted">su ' + eur(r.budgetSett) + '</span></span></div>' +
+      '<div class="review-row"><span>Speso in tutto</span><span class="rv">' + eur(r.tutto) + '</span></div>' +
+      '<div class="review-row"><span>Budget sfizi usato</span><span class="rv">' + r.pct + '%</span></div>' +
+      '<div class="review-row"><span>Patrimonio</span><span class="rv">' + eur(patrimonio()) + '</span></div>' +
+      '<div class="review-end"><span class="rmsg" style="color:' + (r.ok ? 'var(--jade)' : 'var(--amber)') + '">' +
+        (r.ok ? 'Tutto sotto controllo. Non devi fare altro.' : 'Sei andato un po\u2019 sopra. Basta rallentare, niente di rotto.') +
+      '</span><button class="btn sm solid" data-act="rev-ok">Ho visto</button></div>' +
+    '</div></div>';
+}
+
+/* Un solo messaggio alla volta, quello che serve davvero adesso */
+function renderNudge() {
+  const k = thisMonth(), r = ritmo(), scoperti = giorniScoperti(), lib = libero();
+  const IC = {
+    ask: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.3 2.4c-.5.2-.8.7-.8 1.2v.4M12 17h.01"/></svg>',
+    ok: '<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>',
+    up: '<svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg>',
+    warn: '<svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2 18a2 2 0 0 0 1.7 3h16.6A2 2 0 0 0 22 18L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>'
+  };
+  let n = null;
+
+  if (lib < 0) {
+    n = { c: 'warm', i: IC.warn, nc: 'var(--rust)', t: 'Hai destinato più di quello che hai',
+      s: 'Gli obiettivi valgono ' + eur(impegnato()) + ' ma sul conto ci sono ' + eur(patrimonio()) + '. Abbassa un obiettivo o aggiorna i conti.',
+      a: '<button class="btn sm" data-act="go" data-view="patrimonio">Sistemo</button>' };
+  } else if (scoperti.length) {
+    const g = scoperti[0], d = parseD(g);
+    n = { c: '', i: IC.ask, nc: 'var(--amber)', t: 'Il ' + d.getDate() + ' ' + MESI_BR[d.getMonth()] + ' non hai segnato niente',
+      s: 'Era davvero un giorno da zero euro? Se sì confermalo e non te lo chiedo più.',
+      a: '<button class="btn sm ok" data-act="zero-day" data-d="' + g + '">Sì, zero</button>' +
+         '<button class="btn sm" data-act="go" data-view="mese">Segno ora</button>' };
+  } else if (r.diff < 0 && r.recupero > 0) {
+    n = { c: 'warm', i: IC.up, nc: 'var(--amber)', t: 'Sei avanti col ritmo di ' + eur(Math.abs(r.diff)),
+      s: 'Niente di grave: basta stare tranquillo ' + r.recupero + (r.recupero === 1 ? ' giorno' : ' giorni') + ' e torni in pari da solo.' };
+  } else if (r.pass >= 3 && r.diff > r.budget * 0.1) {
+    n = { c: 'calm', i: IC.ok, nc: 'var(--jade)', t: 'Sei in pari, anzi meglio',
+      s: 'Hai ' + eur(r.diff) + ' di margine rispetto al ritmo. A fine mese diventano risparmio.' };
+  } else {
+    const g = S.obiettivi.filter(x => x.t > 0 && x.v < x.t).sort((a, b) => (b.v / b.t) - (a.v / a.t))[0];
+    if (g) {
+      const e = eta(g);
+      n = { c: 'calm', i: IC.up, nc: 'var(--jade)', t: 'Prossimo traguardo: ' + g.l,
+        s: e && e.quando ? 'Ti mancano ' + eur(e.manca) + '. A ' + eur(g.r) + ' al mese ci arrivi entro ' + mLabel(e.quando) + '.'
+          : 'Ti mancano ' + eur(n2(g.t - g.v)) + '. Imposta un versamento mensile per sapere quando ci arrivi.',
+        a: '<button class="btn sm" data-act="go" data-view="patrimonio">Vedi</button>' };
+    } else {
+      n = { c: 'calm', i: IC.ok, nc: 'var(--jade)', t: 'Tutto sotto controllo',
+        s: 'Obiettivi pieni e ritmo in ordine. Non c\'è niente da fare oggi.' };
+    }
+  }
+
+  $('#nudgeSlot').innerHTML = '<div class="nudge ' + n.c + '" style="--nc:' + n.nc + '">' +
+    '<div class="ni">' + n.i + '</div><div class="nt"><b>' + esc(n.t) + '</b><span>' + n.s + '</span>' +
+    (n.a ? '<div class="na">' + n.a + '</div>' : '') + '</div></div>';
+}
+
+const MOV_IC = {
+  sfizio: '<svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7L5.8 21l1.6-7L2 9.3l7.1-.7z"/></svg>',
+  fissa: '<svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg>',
+  extra: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 17h.01"/></svg>',
+  entrata: '<svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg>'
+};
+const MOV_COL = { sfizio: 'var(--amber)', fissa: 'var(--sky)', extra: 'var(--rust)', entrata: 'var(--jade)' };
+function movRows(list, del) {
+  return list.map(x => {
+    const p = x.d.split('-');
+    return '<div class="mov"><div class="mk" style="--mc:' + MOV_COL[x.tipo] + '">' + MOV_IC[x.tipo] + '</div>' +
+      '<div class="mi"><b>' + esc(x.l || x.cat) + '</b><span>' + p[2] + '/' + p[1] + ' · ' + esc(x.cat) + '</span></div>' +
+      '<div class="mv ' + (x.tipo === 'entrata' ? 'in' : '') + '">' + (x.tipo === 'entrata' ? '+' : '−') + eur(x.v) + '</div>' +
+      (del ? '<button class="del" data-act="del-mov" data-id="' + x.id + '">×</button>' : '') + '</div>';
+  }).join('');
+}
+
+/* ---------------- MESE ---------------- */
+function renderMese() {
+  const k = MSEL || thisMonth(); MSEL = k;
+  const b = bilancio(k), m = M(k);
+  $('#mLabel').textContent = mLabel(k);
+  $('[data-act="m-next"]').disabled = k >= thisMonth();
+
+  /* Tre famiglie, non trenta categorie: necessario, piacere, futuro. */
+  const fam = [
+    { l: 'Necessario', v: b.fisse, c: 'var(--sky)', d: 'affitto, bollette, spesa, benzina' },
+    { l: 'Piacere', v: b.sfizi, c: 'var(--amber)', d: 'i tuoi sfizi del mese' },
+    { l: 'Futuro', v: b.acc, c: 'var(--k-focus)', d: 'obiettivi e investimenti' },
+    { l: 'Cuscinetto', v: Math.max(0, b.avanzo), c: 'var(--jade)', d: 'quello che resta libero' }
+  ].filter(x => x.v > 0);
+  const tf = Math.max(1, fam.reduce((a, x) => a + x.v, 0));
+  $('#fam').innerHTML =
+    '<div class="eyebrow" style="margin-bottom:10px">Come si divide il tuo stipendio</div>' +
+    '<div class="fam-bar">' + fam.map(x => '<i style="--fc:' + x.c + ';width:' + (x.v / tf * 100) + '%"></i>').join('') + '</div>' +
+    '<div class="fam-leg">' + fam.map(x => '<div style="--fc:' + x.c + '"><b>' + x.l + '</b>' +
+      '<div class="fv">' + eur(x.v) + ' <span class="tiny muted" style="font-weight:600">' + Math.round(x.v / tf * 100) + '%</span></div>' +
+      '<small>' + x.d + '</small></div>').join('') + '</div>';
+
+  const max = Math.max(b.entrate, 1);
+  const W = v => clamp(v / max * 100, 0, 100);
+  const row = (l, sub, v, c) => '<div class="flow-row"><div class="fbar" style="--fc:' + c + ';width:' + W(Math.abs(v)) + '%"></div>' +
+    '<div class="fl">' + l + (sub ? '<small>' + sub + '</small>' : '') + '</div><div class="fv">' + eurS(v) + '</div></div>';
+
+  $('#flow').innerHTML =
+    '<div class="flow-row"><div class="fbar" style="--fc:var(--jade);width:100%"></div>' +
+    '<div class="fl">Entrate<small><input class="inp ghost mono" style="width:110px;padding:2px 4px" type="number" step="0.01" data-medit="entrate" value="' + m.entrate + '"></small></div>' +
+    '<div class="fv" style="color:var(--jade)">' + eurS(b.entrate) + '</div></div>' +
+    '<div class="flow-sep"></div>' +
+    row('Spese fisse', 'affitto, bollette, spesa, benzina', -b.fisse, 'var(--sky)') +
+    row('Sfizi', 'il tuo budget mensile', -b.sfizi, 'var(--amber)') +
+    row('Obiettivi', (accantonaAttivo() < b.acc
+        ? 'questo mese ne versi ' + eur(accantonaAttivo()) + ': alcuni sono gi\u00e0 pieni'
+        : 'vacanza, auto, investimenti, vestiti'), -b.acc, 'var(--k-focus)') +
+    (b.extra ? row('Fuori budget', 'spese impreviste segnate', -b.extra, 'var(--rust)') : '') +
+    '<div class="flow-sep"></div>' +
+    row('<b>Ti avanza</b>', 'resta libero sul conto', b.avanzo, b.avanzo >= 0 ? 'var(--jade)' : 'var(--rust)');
+
+  const quadra = n2(b.entrate - b.fisse - b.sfizi - b.acc - b.extra - b.avanzo);
+  $('#flowNote').innerHTML =
+    '<div class="note" style="margin-top:14px;border-color:var(--jade)">' +
+      '<b>' + eur(b.entrate) + ' entrati = ' + eur(b.entrate) + ' assegnati.</b> ' +
+      (Math.abs(quadra) < 0.02 ? 'Nessun euro sparito nel nulla: sai esattamente dove è finito ognuno.'
+        : 'Restano ' + eur(quadra) + ' non assegnati.') + '</div>' +
+    (b.daFondi > 0 ? '<div class="note" style="margin-top:10px;border-color:var(--k-focus)">Hai speso <b>' + eur(b.daFondi) +
+      '</b> prendendoli dai fondi che avevi già riempito. Non toccano il bilancio del mese: quei soldi li avevi messi da parte apposta.</div>' : '') +
+    '<div class="note" style="margin-top:10px">Il patrimonio cresce di <b>' + eur(b.accumulo) +
+      '</b> al mese: ' + eur(b.avanzo) + ' che avanzano più ' + eur(b.capMens) + ' che metti da parte e restano tuoi. ' +
+      'Vacanza, vestiti e auto prima o poi li spendi, quindi non li conto.</div>';
+
+  $('#closeSlot').innerHTML = k === thisMonth()
+    ? '<div class="row-actions"><button class="btn solid sm" data-act="chiudi">Chiudi ' + mLabel(k) + '</button></div>'
+    : (m.patrimonio != null ? '<div class="note" style="margin-top:12px;border-color:var(--jade)">Chiuso con <b>' + eur(m.patrimonio) + '</b> di patrimonio.</div>' : '');
+
+  $('#fxList').innerHTML = S.fisse.map(f => {
+    const paid = m.pagate.includes(f.id);
+    return '<div class="fx ' + (paid ? 'paid' : '') + '"><div class="tick" data-act="pay" data-id="' + f.id + '" style="' +
+      (paid ? 'background:var(--jade);border-color:var(--jade)' : '') + '"></div>' +
+      '<div class="nm">' + esc(f.l) + '</div><div class="amt">' + eur(f.v) + '</div></div>';
+  }).join('');
+  $('#fxDone').textContent = eur(b.realeFisse) + ' / ' + eur(b.fisse);
+
+  const spesi = {};
+  MOV(k).filter(x => x.tipo === 'sfizio').forEach(x => spesi[x.cat] = n2((spesi[x.cat] || 0) + x.v));
+  $('#catList').innerHTML = S.sfizi.map((s, i) => {
+    const r = spesi[s.l] || 0, over = r > s.v;
+    return '<div class="cat"><div class="cat-h"><span class="cn">' + esc(s.l) + '</span>' +
+      '<span class="cv" style="color:' + (over ? 'var(--rust)' : 'var(--paper)') + '">' + eur(r) + '</span>' +
+      '<span class="tg tiny muted">/ ' + eur(s.v) + '</span></div>' +
+      '<div class="hbar-track"><i style="--hc:' + (over ? 'var(--rust)' : 'var(' + PALETTE[i % PALETTE.length] + ')') + ';width:' + clamp(s.v ? r / s.v * 100 : 0, 0, 100) + '%"></i></div>' +
+      '<div class="cat-y">a questo ritmo ' + eur(n2(s.v * 12)) + ' all\'anno</div></div>';
+  }).join('');
+  $('#sfTot').textContent = eur(sfiziSpesi(k)) + ' / ' + eur(S.param.sfiziBudget);
+
+  const cats = categorie();
+  $('#nCat').innerHTML = cats.map(c => '<option>' + esc(c.l) + '</option>').join('');
+  if (!$('#nDate').value) $('#nDate').value = k === thisMonth() ? today() : k + '-15';
+  const list = MOV(k).slice().sort((a, x) => x.d.localeCompare(a.d) || x.id.localeCompare(a.id));
+  $('#movList').innerHTML = list.length ? movRows(list, true) : '<div class="empty"><b>Nessun movimento</b>Aggiungine uno qui sotto.</div>';
+  $('#movCount').textContent = list.length ? list.length + ' voci' : '';
+}
+
+/* ---------------- PATRIMONIO ---------------- */
+function renderPatrimonio() {
+  const tot = patrimonio(), lib = libero(), cv = costoVita();
+  countTo($('#patBig'), tot, 'pat');
+  const mesiVita = cv ? n2(tot / cv) : 0;
+  $('#patSub').innerHTML = 'Liberi da usare <b>' + eur(lib) + '</b> · il resto è destinato agli obiettivi.<br>' +
+    'Con questi soldi vivresti <b>' + String(mesiVita).replace('.', ',') + ' mesi</b> senza entrate.';
+
+  /* Wallet Real: quello che hai costruito tu, mese dopo mese */
+  const wr = walletReal(), st = storicoWallet();
+  countTo($('#wrNum'), wr, 'wr');
+  $('#wrNum').style.color = wr >= 0 ? 'var(--jade)' : 'var(--rust)';
+  const chiusi = st.filter(x => x.k !== thisMonth()).length;
+  $('#wrMesi').textContent = chiusi ? chiusi + (chiusi === 1 ? ' mese chiuso' : ' mesi chiusi') : 'primo mese';
+  const b0 = bilancio(thisMonth());
+  const versa = accantonaAttivo();
+  $('#wrSub').innerHTML = wr >= 0
+    ? 'Sono i soldi <b>tuoi davvero</b>: non riservati a nessun obiettivo, non destinati agli sfizi di questo mese. ' +
+      'Spendere uno sfizio non li tocca.<br><span class="tiny" style="color:var(--faint)">' +
+      'Quando chiudi il mese scendono di ' + eur(versa) + ', perché quei soldi passano negli obiettivi: ' +
+      'non li perdi, cambiano solo casella. Poi risalgono con quello che avanza.</span>'
+    : 'Sei sotto di <b>' + eur(Math.abs(wr)) + '</b>: stai attingendo a soldi destinati agli obiettivi. ' +
+      'Non è grave, ma è il segnale di rimettere in pari nei prossimi mesi.';
+
+  if (st.length > 1) {
+    const max = Math.max(...st.map(x => Math.abs(x.v)), 1);
+    const prima = st[0], ora = st[st.length - 1];
+    $('#wrSpark').innerHTML = '<div class="spark">' + st.map(x =>
+      '<div class="sb ' + (x.k === thisMonth() ? 'now' : '') + '" title="' + mShort(x.k) + ': ' + eur(x.v) + '">' +
+      '<i style="height:' + clamp(Math.abs(x.v) / max * 100, 3, 100) + '%"></i></div>').join('') + '</div>' +
+      '<div class="spark-lab">' + st.map(x => '<span>' + MESI_BR[parseD(x.k + '-01').getMonth()] + '</span>').join('') + '</div>' +
+      '<div class="tiny muted" style="margin-top:8px">' + eurS(n2(ora.v - prima.v)) + ' da ' + mShort(prima.k) + '</div>';
+  } else {
+    $('#wrSpark').innerHTML = '<div class="note" style="margin-top:14px">La crescita mese per mese comparirà qui appena chiudi il primo mese dalla scheda <b>Mese</b>.</div>';
+  }
+
+  $('#goalList').innerHTML = S.obiettivi.map((g, i) => {
+    const e = eta(g), p = g.t > 0 ? clamp(g.v / g.t * 100, 0, 100) : 100;
+    const done = g.t > 0 && g.v >= g.t;
+    let foot;
+    if (g.v < -0.01) foot = '<b style="color:var(--rust)">Scoperto di ' + eur(Math.abs(g.v)) + '</b> \u00b7 hai speso pi\u00f9 di quanto avevi messo';
+    else if (done) foot = '<b>Obiettivo raggiunto</b>';
+    else if (e && e.mai) foot = 'Mancano <b>' + eur(e.manca) + '</b> · nessun versamento impostato';
+    else if (e) foot = 'Mancano <b>' + eur(e.manca) + '</b> · pronto entro <b>' + mLabel(e.quando) + '</b>';
+    else foot = 'Cresce di <b>' + eur(g.r) + '</b> al mese';
+    return '<div class="goal ' + (i === OPENG ? 'open' : '') + '" style="--gc:var(' + PALETTE[i % PALETTE.length] + ')">' +
+      '<div class="goal-h"><span class="gn">' + esc(g.l) + '</span><span class="gv">' + eur(g.v) + '</span>' +
+      (g.t > 0 ? '<span class="gt">/ ' + eur(g.t) + ' \u00b7 ' + Math.round(p) + '%</span>' : '') + '</div>' +
+      '<div class="goal-bar ' + (done ? 'done' : '') + '"><i style="' + (g.v < 0 ? 'background:var(--rust);' : '') + 'width:' + (g.v < 0 ? 100 : p) + '%"></i></div>' +
+      '<div class="goal-f"><span>' + foot + '</span>' +
+      '<button class="tiny muted" data-act="open-goal" data-i="' + i + '" style="text-decoration:underline">' + (i === OPENG ? 'chiudi' : 'modifica') + '</button></div>' +
+      '<div class="goal-edit"><div class="gedit-grid">' +
+        '<input class="inp" data-edit="obiettivi|' + g.id + '|l" value="' + esc(g.l) + '">' +
+        '<input class="inp mono" type="number" step="0.01" data-edit="obiettivi|' + g.id + '|v" value="' + g.v + '" title="quanto c\'è">' +
+        '<input class="inp mono" type="number" step="0.01" data-edit="obiettivi|' + g.id + '|t" value="' + g.t + '" title="obiettivo">' +
+        '<input class="inp mono" type="number" step="0.01" data-edit="obiettivi|' + g.id + '|r" value="' + g.r + '" title="al mese">' +
+        '<button class="cchip ' + (g.cap ? 'on' : '') + '" data-act="cap" data-id="' + g.id + '">' + (g.cap ? 'Resta mio' : 'Lo spenderò') + '</button>' +
+        '<button class="btn sm warn" data-act="del" data-coll="obiettivi" data-id="' + g.id + '">Elimina</button>' +
+      '</div><div class="tiny muted" style="margin-top:8px">Nome · quanto c\'è · obiettivo · quanto ci metti ogni mese</div></div></div>';
+  }).join('');
+
+  $('#acctTot').textContent = eur(tot);
+  const AI = { carta: '<svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20"/></svg>',
+    contanti: '<svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>' };
+  $('#acctList').innerHTML = S.conti.map(c =>
+    '<div class="acct"><div class="ai">' + (AI[c.tipo] || AI.carta) + '</div>' +
+    '<input class="inp ghost an" data-edit="conti|' + c.id + '|l" value="' + esc(c.l) + '">' +
+    '<input class="inp mono" type="number" step="0.01" data-edit="conti|' + c.id + '|v" value="' + c.v + '" style="width:112px;text-align:right">' +
+    '<button class="del" data-act="del" data-coll="conti" data-id="' + c.id + '">×</button></div>').join('');
+}
+let OPENG = -1;
+
+/* ---------------- GRAFICI ---------------- */
+function lineChart(keys, vals, mono) {
+  const w = 660, h = 168, pl = 52, pr = 12, pt = 12, pb = 24, iw = w - pl - pr, ih = h - pt - pb;
+  const good = vals.filter(v => v != null);
+  if (!good.length) return '<div class="empty"><b>Ancora nessun dato</b>Chiudi il primo mese e la linea comincia.</div>';
+  let lo = Math.min(...good), hi = Math.max(...good);
+  const pad = (hi - lo) * .18 || Math.max(hi * .06, 100);
+  lo = Math.max(0, lo - pad); hi += pad;
+  const x = i => pl + (keys.length === 1 ? iw / 2 : iw * i / (keys.length - 1));
+  const y = v => pt + ih - (v - lo) / (hi - lo || 1) * ih;
+  const grid = [0, .5, 1].map(f => { const v = lo + (hi - lo) * f;
+    return '<line x1="' + pl + '" x2="' + (w - pr) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="' + (mono ? '#e6e6e6' : 'var(--line-soft)') + '"/>' +
+      '<text x="' + (pl - 7) + '" y="' + (y(v) + 3.5) + '" text-anchor="end" class="chart-label" fill="' + (mono ? '#999' : 'var(--faint)') + '">' + (Math.round(v / 100) / 10) + 'k</text>'; }).join('');
+  const pts = keys.map((k, i) => vals[i] == null ? null : x(i).toFixed(1) + ',' + y(vals[i]).toFixed(1)).filter(Boolean);
+  const area = pts.length > 1 ? '<polygon points="' + pts[0].split(',')[0] + ',' + (pt + ih) + ' ' + pts.join(' ') + ' ' + pts[pts.length - 1].split(',')[0] + ',' + (pt + ih) + '" fill="' + (mono ? '#eee' : 'color-mix(in srgb,var(--jade) 13%,transparent)') + '"/>' : '';
+  const line = pts.length > 1 ? '<polyline points="' + pts.join(' ') + '" fill="none" stroke="' + (mono ? '#111' : 'var(--jade)') + '" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>' : '';
+  const dots = keys.map((k, i) => vals[i] == null ? '' : '<circle cx="' + x(i).toFixed(1) + '" cy="' + y(vals[i]).toFixed(1) + '" r="3.4" fill="' + (mono ? '#fff' : 'var(--panel)') + '" stroke="' + (mono ? '#111' : 'var(--jade)') + '" stroke-width="2"/>').join('');
+  const lab = keys.map((k, i) => '<text x="' + x(i).toFixed(1) + '" y="' + (h - 6) + '" text-anchor="middle" class="chart-label" fill="' + (mono ? '#999' : 'var(--faint)') + '">' + mShort(k) + '</text>').join('');
+  return '<svg viewBox="0 0 ' + w + ' ' + h + '">' + grid + area + line + dots + lab + '</svg>';
+}
+function ioChart(keys, mono) {
+  const w = 660, h = 172, pl = 42, pr = 10, pt = 12, pb = 26, iw = w - pl - pr, ih = h - pt - pb;
+  const rows = keys.map(k => { const b = bilancio(k); return { k, e: b.entrate, u: n2(b.fisse + b.sfizi + b.acc + b.extra), a: b.avanzo }; });
+  const max = Math.max(1, ...rows.map(r => Math.max(r.e, r.u)));
+  const step = iw / rows.length, bw = Math.min(16, step * .3), y = v => pt + ih - (v / max) * ih;
+  const grid = [0, .5, 1].map(f => '<line x1="' + pl + '" x2="' + (w - pr) + '" y1="' + y(max * f) + '" y2="' + y(max * f) + '" stroke="' + (mono ? '#e6e6e6' : 'var(--line-soft)') + '"/>' +
+    '<text x="' + (pl - 6) + '" y="' + (y(max * f) + 3.5) + '" text-anchor="end" class="chart-label" fill="' + (mono ? '#999' : 'var(--faint)') + '">' + Math.round(max * f) + '</text>').join('');
+  const bars = rows.map((r, i) => { const cx = pl + step * i + step / 2;
+    return '<rect x="' + (cx - bw - 2) + '" y="' + y(r.e) + '" width="' + bw + '" height="' + (pt + ih - y(r.e)) + '" rx="3" fill="' + (mono ? '#bbb' : 'var(--jade)') + '"/>' +
+      '<rect x="' + (cx + 2) + '" y="' + y(r.u) + '" width="' + bw + '" height="' + (pt + ih - y(r.u)) + '" rx="3" fill="' + (mono ? '#666' : 'var(--rust)') + '"/>' +
+      '<circle cx="' + cx + '" cy="' + y(Math.max(0, r.a)) + '" r="3" fill="' + (mono ? '#111' : 'var(--amber)') + '"/>'; }).join('');
+  const lab = rows.map((r, i) => '<text x="' + (pl + step * i + step / 2) + '" y="' + (h - 7) + '" text-anchor="middle" class="chart-label" fill="' + (mono ? '#999' : 'var(--faint)') + '">' + mShort(r.k) + '</text>').join('');
+  return '<svg viewBox="0 0 ' + w + ' ' + h + '">' + grid + bars + lab + '</svg>';
+}
+
+/* ---------------- ANDAMENTO ---------------- */
+function renderAndamento() {
+  const keys = mesiStorici(12), vals = keys.map(patrimonioDi);
+  $('#patChart').innerHTML = lineChart(keys, vals, false);
+  const good = vals.filter(v => v != null);
+  $('#patTrend').textContent = good.length > 1 ? eurS(n2(good[good.length - 1] - good[0])) + ' in ' + good.length + ' mesi' : 'in attesa di dati';
+  $('#ioChart').innerHTML = ioChart(keys, false);
+
+  const b = bilancio(thisMonth()), cv = costoVita();
+  const fe = S.obiettivi.find(g => /emerg/i.test(g.l));
+  const mesiFondo = fe && cv ? n2(fe.v / cv) : 0;
+  const line = (l, v, s) => '<div class="stat-line"><span>' + l + (s ? '<br><span class="tiny muted">' + s + '</span>' : '') + '</span><span class="sv">' + v + '</span></div>';
+  $('#healthList').innerHTML =
+    line('Costo della tua vita', eur(cv) + ' / mese', 'spese fisse più sfizi') +
+    line('Il fondo emergenza copre', String(mesiFondo).replace('.', ',') + ' mesi', 'gli esperti consigliano da 3 a 6') +
+    line('Tasso di risparmio', Math.round(b.tasso) + '%', 'sopra il 20% è ottimo') +
+    line('Metti da parte', eur(b.accumulo) + ' / mese', 'quello che resta davvero tuo') +
+    line('Soldi liberi ora', eur(libero()), 'non destinati a nessun obiettivo');
+
+  const p = S.param, base = patrimonio();
+  $('#projection').innerHTML = [['bassa', p.entrateMin], ['tipica', p.entrateTip], ['alta', p.entrateMax]].map(r => {
+    const av = n2(r[1] - fisseTot() - p.sfiziBudget - accantonaTot());
+    const acc = n2(av + b.capMens);
+    return '<div class="stat-line"><span>Con entrata ' + r[0] + '<br><span class="tiny muted">' + eur(r[1]) + ' al mese</span></span>' +
+      '<span class="sv">' + eur(n2(base + acc * 12)) + '<br><span class="tiny muted" style="font-weight:400">' + eurS(n2(acc * 12)) + ' in un anno</span></span></div>';
+  }).join('');
+}
+
+/* ---------------- PIANO (il quaderno) ---------------- */
+/* La data non e' scritta nel file: e' quella del giorno in cui apri. */
+function aggiornaData() {
+  const d = new Date(), day = $('#padDay');
+  if (!day) return;
+  const dow = new Intl.DateTimeFormat('it-IT', { weekday: 'long' }).format(d);
+  day.textContent = d.getDate();
+  $('#padDow').textContent = dow.charAt(0).toUpperCase() + dow.slice(1);
+  $('#padMy').textContent = MESI[d.getMonth()] + ' ' + d.getFullYear();
+}
+function padRow(coll, x) {
+  return '<div class="pad-item">' +
+      '<div class="pad-row">' +
+        '<span class="dash">–</span>' +
+        '<input class="inp ghost" data-edit="' + coll + '|' + x.id + '|l" value="' + esc(x.l) + '">' +
+        '<input class="inp mono" type="number" step="0.01" data-edit="' + coll + '|' + x.id + '|v" value="' + x.v + '">' +
+        '<button class="del" data-act="del" data-coll="' + coll + '" data-id="' + x.id + '">×</button>' +
+      '</div>' +
+      '<div class="pad-note"><input data-edit="' + coll + '|' + x.id + '|n" value="' + esc(x.n || '') +
+        '" placeholder="nota (es. 4 volte, 55 litri × 2,10)"></div>' +
+    '</div>';
+}
+
+function renderPiano() {
+  const p = S.param;
+  aggiornaData();
+
+  const ent = (k, l) => '<div class="pad-row"><span class="dash">–</span>' +
+    '<span style="font-size:13.5px;padding:5px 4px">' + l + '</span>' +
+    '<input class="inp mono" type="number" step="1" data-pedit="' + k + '" value="' + p[k] + '">' +
+    '<span class="eur">€</span></div>';
+  $('#padEntrate').innerHTML = ent('entrateMin', 'Minima') + ent('entrateTip', 'Tipica') + ent('entrateMax', 'Massima');
+
+  $('#padFisse').innerHTML = S.fisse.map(x => padRow('fisse', x)).join('');
+  $('#padFisseTot').textContent = eur(fisseTot());
+
+  $('#padSfizi').innerHTML = S.sfizi.map(x => padRow('sfizi', x)).join('');
+  const sfSomma = n2(S.sfizi.reduce((a, x) => a + x.v, 0));
+  $('#padSfiziTot').innerHTML = eur(sfSomma) +
+    (Math.abs(sfSomma - p.sfiziBudget) > 0.5 ? ' <span class="tiny" style="color:var(--amber);font-weight:600">budget ' + eur(p.sfiziBudget) + '</span>' : '');
+
+  $('#padGoals').innerHTML = S.obiettivi.map(g => {
+    const illim = g.t <= 0;
+    const pct = illim ? 100 : clamp(g.v / g.t * 100, 0, 100);
+    const manca = n2(g.t - g.v);
+    const col = g.v < -0.01 ? 'var(--rust)' : illim ? 'var(--sky)' : (manca <= 0 ? 'var(--jade)' : 'var(--amber)');
+    const C = 62.83; /* 2 · π · 10 */
+    const ring = '<div class="gring" style="--gc:' + col + '">' +
+      '<svg viewBox="0 0 30 30"><circle class="gt" cx="15" cy="15" r="10"/>' +
+      '<circle class="gf" cx="15" cy="15" r="10" stroke-dasharray="' + C + '" stroke-dashoffset="' +
+        (C - C * (g.v < 0 ? 100 : pct) / 100).toFixed(2) + '"/></svg>' +
+      '<b class="' + (illim || g.v < -0.01 ? 'inf' : '') + '">' +
+        (g.v < -0.01 ? '!' : illim ? '∞' : Math.round(pct) + '%') + '</b></div>';
+
+    let sotto;
+    if (g.v < -0.01) sotto = 'Scoperto di <b style="color:var(--rust)">' + eur(Math.abs(g.v)) + '</b>';
+    else if (illim) sotto = 'Senza tetto · cresce di <b>' + eur(g.r) + '</b> al mese';
+    else if (manca <= 0) sotto = '<b style="color:var(--jade)">Completo</b> · ' + eur(g.t) + ' messi da parte';
+    else {
+      const e = eta(g);
+      sotto = 'Mancano <b>' + eur(manca) + '</b>' + (e && e.quando ? ' · pronto entro <b>' + mLabel(e.quando) + '</b>' : ' · nessun versamento impostato');
+    }
+
+    return '<div class="pad-item">' +
+      '<div class="pad-goal"><span class="dash">–</span>' + ring +
+        '<input class="inp ghost gname" data-edit="obiettivi|' + g.id + '|l" value="' + esc(g.l) + '">' +
+        '<button class="del" data-act="del" data-coll="obiettivi" data-id="' + g.id + '">×</button></div>' +
+      '<div class="pad-manca">' + sotto + '</div>' +
+      '<div class="pad-fields">' +
+        '<div><label>Obiettivo</label><input class="inp mono" type="number" step="0.01" data-edit="obiettivi|' + g.id + '|t" value="' + g.t + '" title="quanto ti serve in tutto"></div>' +
+        '<div><label>Dedicato</label><input class="inp mono" type="number" step="0.01" data-edit="obiettivi|' + g.id + '|v" value="' + g.v + '" title="quanto ci hai gia messo"></div>' +
+        '<div><label>Al mese</label><input class="inp mono" type="number" step="0.01" data-edit="obiettivi|' + g.id + '|r" value="' + g.r + '" title="quanto ci metti ogni mese"></div>' +
+      '</div></div>';
+  }).join('');
+  $('#padGoalDed').textContent = eur(impegnato());
+  $('#padGoalTot').textContent = eur(accantonaTot());
+
+  /* Il conto, come lo facevi tu a mano */
+  const usciteFisse = n2(fisseTot() + p.sfiziBudget + accantonaTot());
+  const riga = (l, v, cls) => '<div class="' + (cls || '') + '"><span>' + l + '</span><span>' + v + '</span></div>';
+  $('#padCalc').innerHTML =
+    riga('Spese fisse', '− ' + eur(fisseTot())) +
+    riga('Sfizi', '− ' + eur(p.sfiziBudget)) +
+    riga('Versamenti agli obiettivi', '− ' + eur(accantonaTot())) +
+    riga('Escono ogni mese', eur(usciteFisse), 'sum') +
+    riga('Ti resta con ' + eur(p.entrateMin), eurS(n2(p.entrateMin - usciteFisse))) +
+    riga('Ti resta con ' + eur(p.entrateTip), eurS(n2(p.entrateTip - usciteFisse))) +
+    riga('Ti resta con ' + eur(p.entrateMax), eurS(n2(p.entrateMax - usciteFisse)));
+
+  /* Dove arrivi: patrimonio fra un anno, nelle tre ipotesi */
+  const capMens = n2(S.obiettivi.filter(g => g.cap).reduce((a, g) => a + g.r, 0));
+  const base = patrimonio();
+  $('#padProj').innerHTML =
+    [['bassa', p.entrateMin], ['tipica', p.entrateTip], ['alta', p.entrateMax]].map(r => {
+      const acc = n2(r[1] - usciteFisse + capMens);
+      return riga('Metti da parte (entrata ' + r[0] + ')', eur(acc) + ' / mese');
+    }).join('') +
+    riga('Patrimonio fra 12 mesi', eur(n2(base + (p.entrateTip - usciteFisse + capMens) * 12)), 'sum') +
+    S.obiettivi.filter(g => g.t > 0 && g.v < g.t && g.r > 0).map(g => {
+      const e = eta(g);
+      return riga(g.l + ' pronto', e && e.quando ? mLabel(e.quando) : '—');
+    }).join('');
+}
+
+/* ---------------- SETUP ---------------- */
+function renderSetup() {
+  const p = S.param;
+  const av = n2(p.entrateMin - fisseTot() - p.sfiziBudget - accantonaTot());
+  $('#paramNote').innerHTML = '<div class="note" style="margin-top:14px;border-color:' + (av >= 0 ? 'var(--jade)' : 'var(--rust)') + '">' +
+    'Nel mese peggiore (' + eur(p.entrateMin) + ') dopo ' + eur(fisseTot()) + ' di fisse, ' + eur(p.sfiziBudget) + ' di sfizi e ' +
+    eur(accantonaTot()) + ' negli obiettivi ti restano <b>' + eur(av) + '</b>' +
+    (av < 0 ? '. <b>Il piano non regge</b>: riduci un versamento agli obiettivi.' : '. Il piano regge sempre.') + '</div>';
+
+  const cats = S.sfizi.map(x => x.l);
+  $('#newPreC').innerHTML = cats.map(c => '<option>' + esc(c) + '</option>').join('');
+  $('#preRows').innerHTML = S.preset.map(x =>
+    '<div class="erow env" style="grid-template-columns:1fr 90px 1fr 30px">' +
+    '<input class="inp" data-edit="preset|' + x.id + '|l" value="' + esc(x.l) + '">' +
+    '<input class="inp mono" type="number" step="0.01" data-edit="preset|' + x.id + '|v" value="' + x.v + '">' +
+    '<select class="inp" data-edit="preset|' + x.id + '|c">' + cats.map(c => '<option' + (c === x.c ? ' selected' : '') + '>' + esc(c) + '</option>').join('') + '</select>' +
+    '<button class="del" data-act="del" data-coll="preset" data-id="' + x.id + '">×</button></div>').join('');
+
+  $('#method').innerHTML = METODO;
+}
+const erowMoney = (coll, x) => '<div class="erow money">' +
+  '<input class="inp" data-edit="' + coll + '|' + x.id + '|l" value="' + esc(x.l) + '">' +
+  '<input class="inp mono" type="number" step="0.01" data-edit="' + coll + '|' + x.id + '|v" value="' + x.v + '">' +
+  '<button class="del" data-act="del" data-coll="' + coll + '" data-id="' + x.id + '">×</button></div>';
+
+/* ---------------- REPORT ---------------- */
+function buildReport() {
+  const k = thisMonth(), b = bilancio(k), keys = mesiStorici(12), cv = costoVita();
+  const fe = S.obiettivi.find(g => /emerg/i.test(g.l));
+  const rows = a => a.map(r => '<div class="rp-row"><span>' + esc(r[0]) + '</span><span>' + r[1] + '</span></div>').join('');
+  const spesi = {};
+  MOV(k).filter(x => x.tipo === 'sfizio').forEach(x => spesi[x.cat] = n2((spesi[x.cat] || 0) + x.v));
+  return '<div class="rp-head"><h1>Report soldi · ' + esc(mLabel(k)) + '</h1><span>' +
+      esc(new Intl.DateTimeFormat('it-IT', { dateStyle: 'full' }).format(new Date())) + '</span></div>' +
+    '<div class="rp-kpis">' +
+      '<div class="rp-kpi"><b>' + eur(patrimonio(), 0) + '</b><small>Patrimonio</small></div>' +
+      '<div class="rp-kpi"><b>' + eur(libero(), 0) + '</b><small>Liberi</small></div>' +
+      '<div class="rp-kpi"><b>' + eur(b.accumulo, 0) + '</b><small>Accumulo mese</small></div>' +
+      '<div class="rp-kpi"><b>' + Math.round(b.tasso) + '%</b><small>Tasso risparmio</small></div></div>' +
+    '<div class="rp-sec"><h2>Salute finanziaria</h2>' + rows([
+      ['Costo della vita', eur(cv) + ' / mese'],
+      ['Copertura fondo emergenza', (fe && cv ? String(n2(fe.v / cv)).replace('.', ',') : '0') + ' mesi'],
+      ['Wallet Real (tuoi davvero)', eur(walletReal())],
+      ['Soldi liberi', eur(libero())],
+      ['Evitato con la regola delle 72 ore', eur(S.evitato)]]) + '</div>' +
+    '<div class="rp-sec"><h2>Il mese</h2>' + rows([
+      ['Entrate', eur(b.entrate)], ['Spese fisse', eur(b.fisse)], ['Sfizi (budget)', eur(b.sfizi)],
+      ['Versato negli obiettivi', eur(b.acc)], ['Fuori budget', eur(b.extra)], ['Avanzo libero', eurS(b.avanzo)],
+      ['Sfizi spesi davvero', eur(b.realeSfizi) + ' / ' + eur(b.sfizi)]]) + '</div>' +
+    '<div class="rp-sec"><h2>Obiettivi</h2>' + rows(S.obiettivi.map(g => {
+      const e = eta(g);
+      return [g.l, eur(g.v) + (g.t > 0 ? ' / ' + eur(g.t) : '') + (e && e.quando ? ' · entro ' + mLabel(e.quando) : '')]; })) + '</div>' +
+    '<div class="rp-sec"><h2>Dove stanno i soldi</h2>' + rows(S.conti.map(c => [c.l, eur(c.v)])) + '</div>' +
+    '<div class="rp-sec"><h2>Sfizi: previsto contro reale</h2>' + rows(S.sfizi.map(s => [s.l, eur(spesi[s.l] || 0) + ' / ' + eur(s.v)])) + '</div>' +
+    '<div class="rp-sec"><h2>Patrimonio nel tempo</h2>' + lineChart(keys, keys.map(patrimonioDi), true) + '</div>' +
+    '<div class="rp-sec"><h2>Entrate contro uscite</h2>' + ioChart(keys, true) + '</div>' +
+    '<div class="rp-foot">Soldi · centro di controllo personale</div>';
+}
+function openReport() {
+  $('#reportPrint').innerHTML = buildReport();
+  const old = document.title;
+  document.title = 'Report soldi ' + thisMonth();
+  const back = () => { document.title = old; window.removeEventListener('afterprint', back); };
+  window.addEventListener('afterprint', back);
+  setTimeout(() => window.print(), 50);
+}
+
+/* ================= AZIONI ================= */
+function toast(t) {
+  const e = document.createElement('div'); e.className = 'toast'; e.textContent = t;
+  document.body.appendChild(e); setTimeout(() => e.remove(), 2100);
+}
+function go(v) {
+  VIEW = v;
+  $$('.view').forEach(x => x.classList.toggle('on', x.id === 'v-' + v));
+  $$('.tab').forEach(x => x.classList.toggle('on', x.dataset.view === v));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  renderAll();
+}
+
+function applyEdit(coll, id, field, val) {
+  if (['v','t','r'].includes(field)) val = n2(val);
+  const list = S[coll]; if (!Array.isArray(list)) return;
+  const o = list.find(x => x.id === id); if (o) o[field] = val;
+}
+document.addEventListener('input', e => {
+  const el = e.target.closest('[data-edit]');
+  if (el) { const p = el.dataset.edit.split('|'); applyEdit(p[0], p[1], p[2], el.value); return saveSoon(); }
+  const pe = e.target.closest('[data-pedit]');
+  if (pe) { S.param[pe.dataset.pedit] = n2(pe.value); return saveSoon(); }
+  const me = e.target.closest('[data-medit]');
+  if (me) { M(MSEL || thisMonth())[me.dataset.medit] = n2(me.value); saveSoon(); }
+});
+document.addEventListener('change', e => {
+  if (e.target.closest('[data-edit],[data-pedit],[data-medit]')) {
+    const el = e.target.closest('[data-edit]');
+    if (el) { const p = el.dataset.edit.split('|'); applyEdit(p[0], p[1], p[2], el.value); }
+    const pe = e.target.closest('[data-pedit]'); if (pe) S.param[pe.dataset.pedit] = n2(pe.value);
+    const me = e.target.closest('[data-medit]'); if (me) M(MSEL || thisMonth())[me.dataset.medit] = n2(me.value);
+    saveSoon(); renderAll();
+  }
+});
+
+/* Applica (s=1) o annulla (s=-1) l'effetto di un movimento sui soldi veri. */
+function applica(m, s) {
+  const cash = contCash(), main = contMain(), v = m.v;
+  if (m.tipo === 'entrata') { if (main) main.v = n2(main.v + v * s); return; }
+  if (m.tipo === 'obiettivo') {
+    /* Erano soldi già messi da parte: escono dal conto e dal fondo insieme,
+       così i soldi liberi restano identici. */
+    if (main) main.v = n2(main.v - v * s);
+    const g = S.obiettivi.find(x => x.id === m.gid);
+    if (g) g.v = n2(g.v - v * s);
+    return;
+  }
+  if (m.tipo === 'sfizio' && cash) {
+    if (s > 0) {
+      const da = Math.min(Math.max(cash.v, 0), v);
+      cash.v = n2(cash.v - da);
+      if (v - da > 0.004 && main) main.v = n2(main.v - (v - da));
+    } else cash.v = n2(cash.v + v);
+    return;
+  }
+  if (main) main.v = n2(main.v - v * s);
+}
+function addMov(amt, label, cat, dataStr, mese) {
+  const v = n2(amt); if (!(v > 0)) return false;
+  const info = catInfo(cat), k = mese || thisMonth();
+  const m = { id: uid('m'), d: dataStr || (k === thisMonth() ? today() : k + '-15'),
+    l: label || cat, v, cat, tipo: info.tipo, gid: info.gid || '' };
+  MOV(k).push(m); applica(m, 1);
+  return true;
+}
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const a = b.dataset.act, id = b.dataset.id;
+  const re = () => { saveSoon(); renderAll(); };
+
+  switch (a) {
+    case 'go': return go(b.dataset.view);
+
+    case 'pre': {
+      const p = S.preset.find(x => x.id === id); if (!p) return;
+      addMov(p.v, p.l, p.c);
+      const o = oggiDisponibile();
+      toast(p.l + ' segnato · oggi restano ' + eur(o.oggi));
+      return re();
+    }
+    case 'quick-add': {
+      const v = $('#qAmt').value;
+      if (!addMov(v, $('#qLabel').value.trim(), $('#qCat').value)) return toast('Scrivi prima quanto hai speso');
+      $('#qAmt').value = ''; $('#qLabel').value = '';
+      const o = oggiDisponibile();
+      toast('Segnato · oggi restano ' + eur(o.oggi));
+      return re();
+    }
+    case 'add-mov': {
+      if (!addMov($('#nAmt').value, $('#nLabel').value.trim(), $('#nCat').value, $('#nDate').value, MSEL)) return toast('Manca l\'importo');
+      $('#nAmt').value = ''; $('#nLabel').value = ''; return re();
+    }
+    case 'del-mov': {
+      const k = (VIEW === 'oggi' ? thisMonth() : (MSEL || thisMonth()));
+      const l = MOV(k), i = l.findIndex(x => x.id === id); if (i < 0) return;
+      applica(l[i], -1); l.splice(i, 1); return re();
+    }
+    case 'zero-day': { if (S.zero.indexOf(b.dataset.d) < 0) S.zero.push(b.dataset.d); return re(); }
+    case 'pay': { const m = M(MSEL || thisMonth()); const i = m.pagate.indexOf(id); if (i < 0) m.pagate.push(id); else m.pagate.splice(i, 1); return re(); }
+
+    case 'add-wish': {
+      const l = $('#wLabel').value.trim(); const v = n2($('#wVal').value);
+      if (!l || !(v > 0)) return toast('Servono nome e prezzo');
+      S.voglie.push({ id: uid('w'), l, v, d: new Date().toISOString() });
+      $('#wLabel').value = ''; $('#wVal').value = '';
+      toast('Messo in attesa. Ci risentiamo fra 72 ore.');
+      return re();
+    }
+    case 'wish-del': {
+      const w = S.voglie.find(x => x.id === id);
+      if (w) { S.evitato = n2(S.evitato + w.v); toast('Evitati ' + eur(w.v) + '. In totale ' + eur(S.evitato) + '.'); }
+      S.voglie = S.voglie.filter(x => x.id !== id); return re();
+    }
+    case 'rev-ok': { S.ultimaRev = today(); toast('Settimana archiviata. Non devi fare altro.'); return re(); }
+    case 'wish-buy': {
+      const w = S.voglie.find(x => x.id === id); if (!w) return;
+      addMov(w.v, w.l, 'Fuori budget');
+      S.voglie = S.voglie.filter(x => x.id !== id);
+      toast('Comprato a mente fredda. Segnato fuori budget.');
+      return re();
+    }
+
+    case 'open-goal': { const i = +b.dataset.i; OPENG = (OPENG === i ? -1 : i); return renderPatrimonio(); }
+    case 'cap': { const g = S.obiettivi.find(x => x.id === id); if (g) g.cap = g.cap ? 0 : 1; return re(); }
+    case 'add-goal': {
+      const l = prompt('Come si chiama l\'obiettivo?', 'Nuovo obiettivo'); if (!l) return;
+      const t = n2(prompt('Quanto ti serve in tutto?', '1000'));
+      const r = n2(prompt('Quanto ci metti ogni mese?', '50'));
+      S.obiettivi.push({ id: uid('g'), l: l.trim(), v: 0, t, r, m: '', cap: 0 });
+      OPENG = S.obiettivi.length - 1; return re();
+    }
+    case 'wallet-goal': {
+      const wr = walletReal();
+      if (wr <= 0) return toast('Per ora nel Wallet Real non c\u2019\u00e8 niente da destinare');
+      const v = n2(prompt('Quanto vuoi spostare dal Wallet Real a un obiettivo?\n\nDisponibile: ' + eur(wr), Math.floor(wr)));
+      if (!(v > 0)) return;
+      if (v > wr) return toast('Non puoi spostare pi\u00f9 di ' + eur(wr));
+      const nomi = S.obiettivi.map((g, i) => (i + 1) + ') ' + g.l).join('\n');
+      const i = parseInt(prompt('In quale obiettivo?\n\n' + nomi, '1'), 10) - 1;
+      const g = S.obiettivi[i];
+      if (!g) return toast('Obiettivo non trovato');
+      g.v = n2(g.v + v);
+      toast(eur(v) + ' spostati in "' + g.l + '"');
+      return re();
+    }
+    case 'add-acct': {
+      const l = $('#newAcct').value.trim(); if (!l) return;
+      S.conti.push({ id: uid('a'), l, v: n2($('#newAcctV').value), tipo: /portafogl|contant/i.test(l) ? 'contanti' : 'carta' });
+      $('#newAcct').value = ''; $('#newAcctV').value = ''; return re();
+    }
+    case 'preleva': {
+      const cash = contCash(), main = contMain();
+      if (!cash || !main || cash === main) return toast('Serve un conto di tipo contanti');
+      const manca = Math.max(0, n2(S.param.sfiziBudget - cash.v));
+      const v = n2(prompt('Quanto prelevi?\n\nPer riportare il portafoglio a ' + eur(S.param.sfiziBudget) + ' servono ' + eur(manca) + '.', manca || 100));
+      if (!(v > 0)) return;
+      main.v = n2(main.v - v); cash.v = n2(cash.v + v);
+      toast('Prelievo registrato. Il patrimonio non cambia.');
+      return re();
+    }
+
+    case 'chiudi': {
+      const k = thisMonth(), m = M(k), acc = accantonaAttivo();
+      if (!confirm('Chiudo ' + mLabel(k) + '?\n\n· Fotografo il patrimonio a ' + eur(patrimonio()) +
+        '\n· Verso ' + eur(acc) + ' negli obiettivi ancora da riempire\n\nPuoi sempre rifarlo.')) return;
+      m.patrimonio = patrimonio(); m.wallet = walletReal(); m.chiuso = true;
+      S.obiettivi.forEach(g => { if (g.r > 0) g.v = n2(g.t > 0 ? Math.min(g.t, g.v + g.r) : g.v + g.r); });
+      toast('Mese chiuso. Obiettivi aggiornati.');
+      return re();
+    }
+
+    case 'pad-add-fx': { const l = $('#padNewFx').value.trim(); if (!l) return;
+      S.fisse.push({ id: uid('f'), l, v: n2($('#padNewFxV').value), n: '' });
+      $('#padNewFx').value = ''; $('#padNewFxV').value = ''; return re(); }
+    case 'pad-add-sf': { const l = $('#padNewSf').value.trim(); if (!l) return;
+      S.sfizi.push({ id: uid('s'), l, v: n2($('#padNewSfV').value), n: '' });
+      $('#padNewSf').value = ''; $('#padNewSfV').value = ''; return re(); }
+    case 'add-fx': { const l = $('#newFx').value.trim(); if (!l) return;
+      S.fisse.push({ id: uid('f'), l, v: n2($('#newFxV').value) }); $('#newFx').value = ''; $('#newFxV').value = ''; return re(); }
+    case 'add-sf': { const l = $('#newSf').value.trim(); if (!l) return;
+      S.sfizi.push({ id: uid('s'), l, v: n2($('#newSfV').value) }); $('#newSf').value = ''; $('#newSfV').value = ''; return re(); }
+    case 'add-pre': { const l = $('#newPre').value.trim(); if (!l) return;
+      S.preset.push({ id: uid('p'), l, v: n2($('#newPreV').value), c: $('#newPreC').value }); $('#newPre').value = ''; $('#newPreV').value = ''; return re(); }
+    case 'del': {
+      const coll = b.dataset.coll;
+      if (coll === 'conti' && S.conti.length < 2) return toast('Serve almeno un conto');
+      S[coll] = S[coll].filter(x => x.id !== id); OPENG = -1; return re();
+    }
+
+    case 'sync-on': return SYNC.accendi(($('#syncToken') || {}).value);
+    case 'sync-off': { if (!confirm('Spengo la sincronizzazione su questo dispositivo?\nI dati restano qui e restano nel gist.')) return; SYNC.spegni(); return; }
+    case 'sync-ora': return SYNC.ora();
+    case 'sync-aiuto': { const h = $('#syncAiuto'); if (h) h.classList.toggle('hidden'); return; }
+    case 'report': return openReport();
+    case 'export': {
+      const bl = new Blob([JSON.stringify(S, null, 2)], { type: 'application/json' });
+      const el = document.createElement('a'); el.href = URL.createObjectURL(bl);
+      el.download = 'soldi-backup-' + today() + '.json'; el.click(); URL.revokeObjectURL(el.href);
+      return toast('Backup salvato');
+    }
+    case 'csv': {
+      const out = ['data;descrizione;categoria;tipo;importo'];
+      Object.keys(S.mov).sort().forEach(k => MOV(k).slice().sort((x, y) => x.d.localeCompare(y.d))
+        .forEach(m => out.push([m.d, '"' + String(m.l).replace(/"/g, '""') + '"', m.cat, m.tipo, String(m.v).replace('.', ',')].join(';'))));
+      const bl = new Blob(['\ufeff' + out.join('\n')], { type: 'text/csv;charset=utf-8' });
+      const el = document.createElement('a'); el.href = URL.createObjectURL(bl);
+      el.download = 'movimenti-' + today() + '.csv'; el.click(); URL.revokeObjectURL(el.href);
+      return toast('CSV salvato');
+    }
+    case 'import': return $('#fileIn').click();
+    case 'reset': {
+      if (!confirm('Cancello tutto e riparto dai valori iniziali?')) return;
+      S = normalize(null); MSEL = null; OPENG = -1; animato = {};
+      saveNow(); applyTheme(); renderAll(); return toast('Ricominciato da zero');
+    }
+    case 'm-prev': MSEL = addM(MSEL || thisMonth(), -1); $('#nDate').value = ''; return renderMese();
+    case 'm-next': { const n = addM(MSEL || thisMonth(), 1); if (n <= thisMonth()) { MSEL = n; $('#nDate').value = ''; } return renderMese(); }
+  }
+});
+
+/* ================= TEMA E FILE ================= */
+function applyTheme() {
+  document.documentElement.dataset.theme = S.theme;
+  const mt = document.querySelector('meta[name="theme-color"]');
+  if (mt) mt.setAttribute('content', S.theme === 'light' ? '#f2f1ed' : '#101219');
+}
+$('#themeBtn').addEventListener('click', () => { S.theme = S.theme === 'dark' ? 'light' : 'dark'; applyTheme(); saveSoon(); });
+$('#saveBtn').addEventListener('click', () => { saveNow(); toast('Salvato su questo dispositivo'); });
+$('#fileIn').addEventListener('change', ev => {
+  const f = ev.target.files[0]; if (!f) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try { S = normalize(JSON.parse(rd.result)); MSEL = null; animato = {}; saveNow(); applyTheme(); renderAll(); toast('Backup importato'); }
+    catch (err) { alert('Questo file non è un backup valido.'); }
+    ev.target.value = '';
+  };
+  rd.readAsText(f);
+});
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); saveNow(); toast('Salvato'); }
+  if (e.key === 'Enter' && document.activeElement && document.activeElement.id === 'qAmt') {
+    const btn = document.querySelector('[data-act="quick-add"]'); if (btn) btn.click();
+  }
+});
+
+
+/* ============================================================
+   SINCRONIZZAZIONE FRA DISPOSITIVI
+   Appoggia i dati su un gist privato di GitHub. Un solo gist per
+   entrambe le app: dentro ci sono due file separati.
+   Il token resta su questo dispositivo e non finisce mai nei backup.
+   ============================================================ */
+var SYNC = (function () {
+  const CKEY = 'sistema.sync.v1';
+  const DESC = 'Sistema personale · dati (non cancellare)';
+  let cfg = { token: '', gist: '', on: false, last: 0 };
+  let hook = null, stato = 'off', msg = '', pushT = null, lastPull = 0, busy = false;
+
+  function loadCfg() { try { const r = localStorage.getItem(CKEY); if (r) Object.assign(cfg, JSON.parse(r)); } catch (e) {} }
+  function saveCfg() { try { localStorage.setItem(CKEY, JSON.stringify(cfg)); } catch (e) {} }
+
+  async function gh(path, opt) {
+    const o = Object.assign({}, opt || {});
+    o.headers = Object.assign({ Accept: 'application/vnd.github+json', Authorization: 'Bearer ' + cfg.token }, o.headers || {});
+    if (o.body && typeof o.body !== 'string') { o.body = JSON.stringify(o.body); o.headers['Content-Type'] = 'application/json'; }
+    let r;
+    try { r = await fetch('https://api.github.com' + path, o); }
+    catch (e) { throw new Error('Nessuna connessione'); }
+    if (r.status === 401) throw new Error('Token non valido o scaduto');
+    if (r.status === 403 || r.status === 404) throw new Error('Al token manca il permesso sui gist');
+    if (!r.ok) throw new Error('GitHub ha risposto ' + r.status);
+    return r.json();
+  }
+
+  function setStato(s, m) { stato = s; msg = m || ''; disegna(); }
+
+  const ICONE = {
+    off: '<svg viewBox="0 0 24 24"><path d="M18 10h-1.3A6 6 0 0 0 6 8.6"/><path d="M3 3l18 18"/><path d="M8 16h10a4 4 0 0 0 1.5-7.7"/></svg>',
+    ok: '<svg viewBox="0 0 24 24"><path d="M18 10h-1.3A6 6 0 1 0 6 15h12a3.5 3.5 0 0 0 0-7z"/><path d="M9.5 13.5l1.8 1.8 3.4-3.6"/></svg>',
+    sync: '<svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14-4M4 13a8 8 0 0 0 14 4"/><path d="M4 5v4h4M20 19v-4h-4"/></svg>',
+    err: '<svg viewBox="0 0 24 24"><path d="M18 10h-1.3A6 6 0 1 0 6 15h12a3.5 3.5 0 0 0 0-7z"/><path d="M12 9v3M12 15h.01"/></svg>'
+  };
+  const COL = { off: 'var(--faint)', ok: 'var(--jade)', sync: 'var(--amber)', err: 'var(--rust)' };
+  const TESTO = {
+    off: 'Sincronizzazione spenta',
+    ok: 'Allineato',
+    sync: 'Sto sincronizzando…',
+    err: 'Problema di sincronizzazione'
+  };
+
+  function quando(t) {
+    if (!t) return 'mai';
+    const d = new Date(t), m = Math.round((Date.now() - t) / 60000);
+    if (m < 1) return 'adesso';
+    if (m < 60) return m + ' minuti fa';
+    if (m < 1440) return Math.round(m / 60) + ' ore fa';
+    return new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(d);
+  }
+
+  function disegna() {
+    const pill = document.querySelector('#syncPill');
+    if (pill) {
+      pill.innerHTML = ICONE[stato];
+      pill.style.color = COL[stato];
+      pill.title = msg || TESTO[stato];
+      pill.classList.toggle('girando', stato === 'sync');
+    }
+    const box = document.querySelector('#syncSlot');
+    if (!box) return;
+    if (!cfg.on) {
+      box.innerHTML =
+        '<div class="note" style="margin-bottom:14px">Con la sincronizzazione attiva, quello che segni sul telefono lo ritrovi sul computer e viceversa, senza esportare e importare niente. I dati stanno in un <b>gist privato</b> del tuo account GitHub: gratis, solo tuo, con lo storico delle versioni.</div>' +
+        '<div class="field"><label>Token GitHub</label><input class="inp" id="syncToken" type="password" placeholder="ghp_..." autocomplete="off"></div>' +
+        '<div class="row-actions"><button class="btn solid" data-act="sync-on">Attiva</button>' +
+        '<button class="btn sm" data-act="sync-aiuto">Come ottengo il token</button></div>' +
+        (msg ? '<div class="note" style="margin-top:12px;border-color:var(--rust)">' + msg + '</div>' : '') +
+        '<div id="syncAiuto" class="hidden"><hr class="sep"><div class="note">' +
+          '<b>Una volta sola, cinque minuti:</b><br>' +
+          '1. Vai su <b>github.com</b> e fatti un account, se non ce l\'hai.<br>' +
+          '2. Apri <b>Settings → Developer settings → Personal access tokens → Tokens (classic)</b>.<br>' +
+          '3. <b>Generate new token (classic)</b>. Dai un nome tipo "sistema personale".<br>' +
+          '4. In Expiration scegli <b>No expiration</b>, altrimenti fra tre mesi smette di funzionare.<br>' +
+          '5. Fra i permessi spunta <b>solo</b> la casella <b>gist</b>. Nient\'altro.<br>' +
+          '6. Genera, copia il codice e incollalo qui sopra. <b>Fallo su tutti e due i dispositivi</b>, con lo stesso token.<br><br>' +
+          'Il gist lo creo io da solo alla prima attivazione: tu devi solo incollare il token.' +
+        '</div></div>';
+    } else {
+      box.innerHTML =
+        '<div class="stat-line"><span>Stato</span><span class="sv" style="color:' + COL[stato] + '">' + (msg || TESTO[stato]) + '</span></div>' +
+        '<div class="stat-line"><span>Ultimo allineamento</span><span class="sv">' + quando(cfg.last) + '</span></div>' +
+        '<div class="stat-line"><span>Archivio</span><span class="sv"><a href="https://gist.github.com/' + cfg.gist + '" target="_blank" rel="noopener">apri il gist</a></span></div>' +
+        '<div class="row-actions"><button class="btn solid sm" data-act="sync-ora">Sincronizza adesso</button>' +
+        '<button class="btn sm warn" data-act="sync-off">Disattiva</button></div>' +
+        '<div class="note" style="margin-top:14px">Si allinea da solo quando apri l\'app e pochi secondi dopo ogni modifica. Il token resta su questo dispositivo e <b>non finisce nei backup</b> che esporti.</div>';
+    }
+  }
+
+  async function trovaGist() {
+    const l = await gh('/gists?per_page=100');
+    const g = (l || []).find(x => x.description === DESC);
+    return g ? g.id : null;
+  }
+  async function creaGist() {
+    const files = {};
+    files[hook.file] = { content: JSON.stringify({ updatedAt: 0, data: null }, null, 1) };
+    const g = await gh('/gists', { method: 'POST', body: { description: DESC, public: false, files } });
+    return g.id;
+  }
+  async function leggi() {
+    const g = await gh('/gists/' + cfg.gist);
+    const f = g.files && g.files[hook.file];
+    if (!f) return null;
+    let txt = f.content;
+    if (f.truncated && f.raw_url) { const r = await fetch(f.raw_url); txt = await r.text(); }
+    try { const o = JSON.parse(txt); return (o && o.data) ? o : null; } catch (e) { return null; }
+  }
+  async function scrivi(stato0) {
+    const files = {};
+    files[hook.file] = { content: JSON.stringify({ updatedAt: stato0.updatedAt || Date.now(), data: stato0 }, null, 1) };
+    await gh('/gists/' + cfg.gist, { method: 'PATCH', body: { files } });
+  }
+
+  function chiediConflitto(loc, rem) {
+    return new Promise(res => {
+      const m = document.createElement('div');
+      m.className = 'modal';
+      m.innerHTML = '<div class="sheet"><div class="eyebrow">Due versioni diverse</div>' +
+        '<h3>Quale tengo?</h3>' +
+        '<div class="note" style="margin:12px 0">Hai modificato i dati sia qui che su un altro dispositivo dopo l\'ultimo allineamento. Devo tenerne una sola: l\'altra la ritrovi comunque nello storico del gist.</div>' +
+        '<div class="stat-line"><span>Questo dispositivo</span><span class="sv">' + quando(loc) + '</span></div>' +
+        '<div class="stat-line"><span>L\'altro dispositivo</span><span class="sv">' + quando(rem) + '</span></div>' +
+        '<div class="row-actions" style="justify-content:flex-end;margin-top:16px">' +
+        '<button class="btn" data-k="loc">Tengo questo</button>' +
+        '<button class="btn solid" data-k="rem">Prendo l\'altro</button></div></div>';
+      document.body.appendChild(m);
+      m.addEventListener('click', e => {
+        const b = e.target.closest('[data-k]');
+        if (b) { m.remove(); res(b.dataset.k); }
+      });
+    });
+  }
+
+  async function sincronizza(forza) {
+    if (!cfg.on || busy) return;
+    if (!forza && Date.now() - lastPull < 20000) return;
+    busy = true; setStato('sync');
+    try {
+      const loc = hook.get();
+      const locT = loc.updatedAt || 0;
+      const rem = await leggi();
+      lastPull = Date.now();
+
+      if (!rem) { await scrivi(loc); cfg.last = Date.now(); }
+      /* Se entrambi i lati sono cambiati dall'ultimo accordo, decidi tu: non scelgo io. */
+      else if (rem.updatedAt > cfg.last && locT > cfg.last) {
+        const scelta = await chiediConflitto(locT, rem.updatedAt);
+        if (scelta === 'rem') { hook.set(rem.data); cfg.last = rem.updatedAt; }
+        else { loc.updatedAt = Date.now(); await scrivi(loc); cfg.last = loc.updatedAt; }
+      }
+      else if (rem.updatedAt > locT) { hook.set(rem.data); cfg.last = rem.updatedAt; }
+      else if (locT > cfg.last) { await scrivi(loc); cfg.last = locT; }
+      else cfg.last = Date.now();
+
+      saveCfg(); setStato('ok');
+    } catch (e) {
+      setStato('err', e.message || 'Errore');
+    } finally { busy = false; }
+  }
+
+  function push() {
+    if (!cfg.on) return;
+    clearTimeout(pushT);
+    pushT = setTimeout(() => sincronizza(true), 6000);
+  }
+
+  return {
+    init(h) {
+      hook = h; loadCfg();
+      disegna();
+      if (cfg.on) sincronizza(true);
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) sincronizza(false); });
+      window.addEventListener('focus', () => sincronizza(false));
+    },
+    push, disegna,
+    attivo: () => cfg.on,
+    async accendi(token) {
+      cfg.token = String(token || '').trim();
+      if (!cfg.token) { setStato('err', 'Incolla prima il token'); return; }
+      setStato('sync', 'Collego…');
+      try {
+        let id = await trovaGist();
+        if (!id) id = await creaGist();
+        cfg.gist = id; cfg.on = true; cfg.last = 0; saveCfg();
+        await sincronizza(true);
+      } catch (e) { cfg.on = false; setStato('err', e.message || 'Non ci sono riuscito'); }
+    },
+    spegni() {
+      cfg = { token: '', gist: '', on: false, last: 0 };
+      saveCfg(); setStato('off');
+    },
+    ora() { sincronizza(true); }
+  };
+})();
+
+/* ================= AVVIO ================= */
+(async function boot() {
+  const t0 = Date.now();
+  S = normalize(await Store.get());
+  MSEL = thisMonth(); M(); applyTheme(); renderAll(); saveNow();
+  SYNC.init({
+    file: 'sistema-soldi.json',
+    get: () => S,
+    set: o => { S = normalize(o); MSEL = thisMonth(); animato = {}; M(); applyTheme(); renderAll(); saveNow(); }
+  });
+  setTimeout(() => { const l = $('#loadScreen'); if (l) l.classList.add('gone'); }, Math.max(0, 340 - (Date.now() - t0)));
+
+  let lastM = thisMonth(), lastD = today();
+  setInterval(() => {
+    renderHeader();
+    aggiornaData();
+    if (thisMonth() !== lastM) { lastM = thisMonth(); lastD = today(); MSEL = lastM; M(); animato = {}; return renderAll(); }
+    if (today() !== lastD) { lastD = today(); if (VIEW === 'oggi') renderOggi(); }
+  }, 30000);
+})();
+</script>
+</body>
+</html>
